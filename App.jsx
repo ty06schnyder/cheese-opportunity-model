@@ -1,9 +1,7 @@
 
 import React, { useState } from "react";
 
-// Default scoring criteria (editable)
 const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
-
 
 const defaultOpp = (criteria) => {
   const base = { name: "" };
@@ -13,6 +11,11 @@ const defaultOpp = (criteria) => {
 
 export default function App() {
   const [criteria, setCriteria] = useState(defaultCriteria);
+  const [weights, setWeights] = useState(
+    Object.fromEntries(defaultCriteria.map((c) => [c, 1]))
+  );
+
+
   const [opps, setOpps] = useState([
     { ...defaultOpp(defaultCriteria), name: "Hispanic Cheese @ Walmart" },
     { ...defaultOpp(defaultCriteria), name: "Value Gouda (<$5)" },
@@ -29,7 +32,6 @@ export default function App() {
     const oldKey = newCriteria[index];
     newCriteria[index] = value;
 
-
     const updatedOpps = opps.map((opp) => {
       const newOpp = { ...opp };
       newOpp[value] = newOpp[oldKey] || 3;
@@ -37,12 +39,17 @@ export default function App() {
       return newOpp;
     });
 
-
+    const newWeights = { ...weights };
+    newWeights[value] = newWeights[oldKey];
+    delete newWeights[oldKey];
     setCriteria(newCriteria);
     setOpps(updatedOpps);
+    setWeights(newWeights);
   };
 
-
+  const updateWeight = (key, value) => {
+    setWeights({ ...weights, [key]: Number(value) });
+  };
   const addOpportunity = () => {
     setOpps([...opps, defaultOpp(criteria)]);
   };
@@ -52,9 +59,14 @@ export default function App() {
   };
 
   const scoredOpps = opps.map((opp) => {
-    const total = criteria.reduce((sum, c) => sum + (opp[c] || 0), 0);
+    const total = criteria.reduce(
+      (sum, c) => sum + (opp[c] || 0) * (weights[c] || 1),
+      0
+    );
     return { ...opp, total };
   });
+
+
   const ranked = [...scoredOpps].sort((a, b) => b.total - a.total);
 
   const exportToCSV = () => {
@@ -68,6 +80,8 @@ export default function App() {
     const csvContent = [headers, ...rows]
       .map((row) => row.join(","))
       .join("\n");
+
+
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -76,11 +90,26 @@ export default function App() {
     link.click();
   };
 
+  // Color function (1–5 scale)
+  const getColor = (value) => {
+    if (value >= 5) return "#16a34a";
+    if (value >= 4) return "#4ade80";
+    if (value === 3) return "#facc15";
+    if (value === 2) return "#fb923c";
+    return "#ef4444";
+  };
+
+
   return (
     <div style={{ padding: 30, fontFamily: "Inter, Arial, sans-serif" }}>
-      <h1 style={{ marginBottom: 20 }}>AI Opportunity Model</h1>
-      {/* Table */}
-      <div style={{ border: "1px solid #ddd", borderRadius: 8, overflow: "hidden" }}>
+      <h1 style={{ marginBottom: 20 }}>
+        Opportunity Prioritization Model
+      </h1>
+
+
+      <div
+        style={{ border: "1px solid #ddd", borderRadius: 8, overflow: "hidden" }}
+      >
         {/* Header Row */}
         <div
           style={{
@@ -93,18 +122,24 @@ export default function App() {
         >
           <div>Opportunity</div>
           {criteria.map((c, i) => (
-            <input
-              key={i}
-              value={c}
-              onChange={(e) => updateCriteria(i, e.target.value)}
-              style={{ fontWeight: "bold" }}
-            />
+            <div key={i} style={{ textAlign: "center" }}>
+              <input
+                value={c}
+                onChange={(e) => updateCriteria(i, e.target.value)}
+                style={{ width: "100%", fontWeight: "bold" }}
+              />
+              <input
+                type="number"
+                value={weights[c]}
+                onChange={(e) => updateWeight(c, e.target.value)}
+                style={{ width: "60px", marginTop: 4 }}
+              />
+            </div>
           ))}
           <div></div>
         </div>
 
-
-        {/* Data Rows */}
+        {/* Rows */}
         {opps.map((opp, i) => (
           <div
             key={i}
@@ -130,16 +165,23 @@ export default function App() {
                 max="5"
                 value={opp[c]}
                 onChange={(e) => updateValue(i, c, e.target.value)}
-                style={{ width: "60px" }}
+                style={{
+                  width: "60px",
+                  background: getColor(opp[c]),
+                  color: "white",
+                  border: "none",
+                  borderRadius: 4,
+                  padding: 2,
+                }}
               />
             ))}
-
 
             <button onClick={() => removeOpportunity(i)}>✕</button>
           </div>
         ))}
       </div>
-      {/* Controls */}
+
+
       <div style={{ marginTop: 15 }}>
         <button onClick={addOpportunity} style={{ marginRight: 10 }}>
           + Add Opportunity
@@ -147,7 +189,6 @@ export default function App() {
         <button onClick={exportToCSV}>Export to Excel</button>
       </div>
 
-      {/* Ranking */}
       <div style={{ marginTop: 30 }}>
         <h2>Ranked Opportunities</h2>
         {ranked.map((opp, i) => (
@@ -160,6 +201,7 @@ export default function App() {
               background: "#f2f4f7",
               marginBottom: 6,
               borderRadius: 6,
+              borderLeft: `6px solid ${getColor(Math.round(opp.total / 5))}`,
             }}
           >
             <span>{opp.name || "Unnamed"}</span>

@@ -15,7 +15,6 @@ export default function App() {
     Object.fromEntries(defaultCriteria.map((c) => [c, 1]))
   );
 
-
   const [opps, setOpps] = useState([
     { ...defaultOpp(defaultCriteria), name: "Hispanic Cheese @ Walmart" },
     { ...defaultOpp(defaultCriteria), name: "Value Gouda (<$5)" },
@@ -42,6 +41,7 @@ export default function App() {
     const newWeights = { ...weights };
     newWeights[value] = newWeights[oldKey];
     delete newWeights[oldKey];
+
     setCriteria(newCriteria);
     setOpps(updatedOpps);
     setWeights(newWeights);
@@ -50,6 +50,38 @@ export default function App() {
   const updateWeight = (key, value) => {
     setWeights({ ...weights, [key]: Number(value) });
   };
+
+  const addCriteria = () => {
+    const newKey = `Criteria ${criteria.length + 1}`;
+    setCriteria([...criteria, newKey]);
+    setWeights({ ...weights, [newKey]: 1 });
+
+    const updatedOpps = opps.map((opp) => ({
+      ...opp,
+      [newKey]: 3,
+    }));
+    setOpps(updatedOpps);
+  };
+
+  const removeCriteria = () => {
+    if (criteria.length === 0) return;
+    const last = criteria[criteria.length - 1];
+
+    setCriteria(criteria.slice(0, -1));
+
+    const newWeights = { ...weights };
+    delete newWeights[last];
+    setWeights(newWeights);
+
+    const updatedOpps = opps.map((opp) => {
+      const newOpp = { ...opp };
+      delete newOpp[last];
+      return newOpp;
+    });
+
+    setOpps(updatedOpps);
+  };
+
   const addOpportunity = () => {
     setOpps([...opps, defaultOpp(criteria)]);
   };
@@ -66,21 +98,24 @@ export default function App() {
     return { ...opp, total };
   });
 
-
   const ranked = [...scoredOpps].sort((a, b) => b.total - a.total);
 
   const exportToCSV = () => {
-    const headers = ["Opportunity", ...criteria, "Total"];
+    const headers = [
+      "Opportunity",
+      ...criteria.flatMap((c) => [c, `${c} Weight`]),
+      "Total",
+    ];
+
     const rows = ranked.map((opp) => [
       opp.name,
-      ...criteria.map((c) => opp[c]),
+      ...criteria.flatMap((c) => [opp[c], weights[c]]),
       opp.total,
     ]);
 
     const csvContent = [headers, ...rows]
       .map((row) => row.join(","))
       .join("\n");
-
 
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
@@ -90,7 +125,6 @@ export default function App() {
     link.click();
   };
 
-  // Color function (1–5 scale)
   const getColor = (value) => {
     if (value >= 5) return "#16a34a";
     if (value >= 4) return "#4ade80";
@@ -99,43 +133,47 @@ export default function App() {
     return "#ef4444";
   };
 
-
   return (
     <div style={{ padding: 30, fontFamily: "Inter, Arial, sans-serif" }}>
       <h1 style={{ marginBottom: 20 }}>
         Opportunity Prioritization Model
       </h1>
 
-
       <div
         style={{ border: "1px solid #ddd", borderRadius: 8, overflow: "hidden" }}
       >
-        {/* Header Row */}
+        {/* Header */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: `2fr repeat(${criteria.length}, 1fr) auto`,
+            gridTemplateColumns: `2fr repeat(${criteria.length}, 1fr 0.8fr) auto`,
             background: "#f7f7f7",
             padding: 10,
             fontWeight: "bold",
           }}
         >
           <div>Opportunity</div>
+
           {criteria.map((c, i) => (
-            <div key={i} style={{ textAlign: "center" }}>
+            <>
               <input
+                key={`name-${i}`}
                 value={c}
                 onChange={(e) => updateCriteria(i, e.target.value)}
-                style={{ width: "100%", fontWeight: "bold" }}
+                style={{ width: "100%" }}
               />
-              <input
-                type="number"
-                value={weights[c]}
-                onChange={(e) => updateWeight(c, e.target.value)}
-                style={{ width: "60px", marginTop: 4 }}
-              />
-            </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <input
+                  type="number"
+                  value={weights[c]}
+                  onChange={(e) => updateWeight(c, e.target.value)}
+                  style={{ width: "50px" }}
+                />
+                %
+              </div>
+            </>
           ))}
+
           <div></div>
         </div>
 
@@ -145,7 +183,7 @@ export default function App() {
             key={i}
             style={{
               display: "grid",
-              gridTemplateColumns: `2fr repeat(${criteria.length}, 1fr) auto`,
+              gridTemplateColumns: `2fr repeat(${criteria.length}, 1fr 0.8fr) auto`,
               padding: 10,
               borderTop: "1px solid #eee",
               alignItems: "center",
@@ -153,27 +191,30 @@ export default function App() {
           >
             <input
               value={opp.name}
-              placeholder="Opportunity name"
+              placeholder="Opportunity"
               onChange={(e) => updateValue(i, "name", e.target.value)}
             />
 
             {criteria.map((c) => (
-              <input
-                key={c}
-                type="number"
-                min="1"
-                max="5"
-                value={opp[c]}
-                onChange={(e) => updateValue(i, c, e.target.value)}
-                style={{
-                  width: "60px",
-                  background: getColor(opp[c]),
-                  color: "white",
-                  border: "none",
-                  borderRadius: 4,
-                  padding: 2,
-                }}
-              />
+              <>
+                <input
+                  key={`score-${c}`}
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={opp[c]}
+                  onChange={(e) => updateValue(i, c, e.target.value)}
+                  style={{
+                    width: "60px",
+                    background: getColor(opp[c]),
+                    color: "white",
+                    border: "none",
+                    borderRadius: 4,
+                    padding: 2,
+                  }}
+                />
+                <div style={{ textAlign: "center" }}>{weights[c]}%</div>
+              </>
             ))}
 
             <button onClick={() => removeOpportunity(i)}>✕</button>
@@ -181,10 +222,15 @@ export default function App() {
         ))}
       </div>
 
-
       <div style={{ marginTop: 15 }}>
         <button onClick={addOpportunity} style={{ marginRight: 10 }}>
           + Add Opportunity
+        </button>
+        <button onClick={addCriteria} style={{ marginRight: 10 }}>
+          + Add Criteria
+        </button>
+        <button onClick={removeCriteria} style={{ marginRight: 10 }}>
+          − Remove Criteria
         </button>
         <button onClick={exportToCSV}>Export to Excel</button>
       </div>

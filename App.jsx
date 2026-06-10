@@ -11,8 +11,11 @@ const defaultOpp = (criteria) => {
 
 export default function App() {
   const [criteria, setCriteria] = useState(defaultCriteria);
+
+
+  // ✅ Default weights now 20%
   const [weights, setWeights] = useState(
-    Object.fromEntries(defaultCriteria.map((c) => [c, 1]))
+    Object.fromEntries(defaultCriteria.map((c) => [c, 20]))
   );
 
   const [opps, setOpps] = useState([
@@ -47,14 +50,19 @@ export default function App() {
     setWeights(newWeights);
   };
 
+  // ✅ Fix input bug + prevent leading zero issue
   const updateWeight = (key, value) => {
-    setWeights({ ...weights, [key]: Number(value) });
+    const clean = value.replace(/^0+(?=\d)/, "");
+    setWeights({ ...weights, [key]: Number(clean || 0) });
   };
 
   const addCriteria = () => {
     const newKey = `Criteria ${criteria.length + 1}`;
     setCriteria([...criteria, newKey]);
-    setWeights({ ...weights, [newKey]: 1 });
+
+    // ✅ new criteria defaults to 20%
+    setWeights({ ...weights, [newKey]: 20 });
+
 
     const updatedOpps = opps.map((opp) => ({
       ...opp,
@@ -90,33 +98,34 @@ export default function App() {
     setOpps(opps.filter((_, i) => i !== index));
   };
 
+  // ✅ Normalize weights so total always behaves like % (sums to 1)
+  const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0) || 1;
+
+
   const scoredOpps = opps.map((opp) => {
-    const total = criteria.reduce(
-      (sum, c) => sum + (opp[c] || 0) * (weights[c] || 1),
-      0
-    );
-    return { ...opp, total };
+    const total = criteria.reduce((sum, c) => {
+      const weightNormalized = (weights[c] || 0) / totalWeight;
+      return sum + (opp[c] || 0) * weightNormalized * criteria.length;
+    }, 0);
+
+
+    return { ...opp, total: Number(total.toFixed(2)) };
   });
 
   const ranked = [...scoredOpps].sort((a, b) => b.total - a.total);
 
   const exportToCSV = () => {
-    const headers = [
-      "Opportunity",
-      ...criteria.flatMap((c) => [c, `${c} Weight`]),
-      "Total",
-    ];
+    const headers = ["Opportunity", ...criteria, "Total"];
 
     const rows = ranked.map((opp) => [
       opp.name,
-      ...criteria.flatMap((c) => [opp[c], weights[c]]),
+      ...criteria.map((c) => opp[c]),
       opp.total,
     ]);
 
     const csvContent = [headers, ...rows]
       .map((row) => row.join(","))
       .join("\n");
-
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -128,8 +137,8 @@ export default function App() {
   const getColor = (value) => {
     if (value >= 5) return "#16a34a";
     if (value >= 4) return "#4ade80";
-    if (value === 3) return "#facc15";
-    if (value === 2) return "#fb923c";
+    if (value >= 3) return "#facc15";
+    if (value >= 2) return "#fb923c";
     return "#ef4444";
   };
 
@@ -164,7 +173,7 @@ export default function App() {
               />
               <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 <input
-                  type="number"
+                  type="text"
                   value={weights[c]}
                   onChange={(e) => updateWeight(c, e.target.value)}
                   style={{ width: "50px" }}
@@ -213,7 +222,7 @@ export default function App() {
                     padding: 2,
                   }}
                 />
-                <div style={{ textAlign: "center" }}>{weights[c]}%</div>
+                <div></div>
               </>
             ))}
 
@@ -247,7 +256,7 @@ export default function App() {
               background: "#f2f4f7",
               marginBottom: 6,
               borderRadius: 6,
-              borderLeft: `6px solid ${getColor(Math.round(opp.total / 5))}`,
+              borderLeft: `6px solid ${getColor(Math.round(opp.total))}`,
             }}
           >
             <span>{opp.name || "Unnamed"}</span>

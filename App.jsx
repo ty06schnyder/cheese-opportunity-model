@@ -1,4 +1,5 @@
 
+
 import React, { useState } from "react";
 
 const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
@@ -12,7 +13,6 @@ const defaultOpp = (criteria) => {
 export default function App() {
   const [criteria, setCriteria] = useState(defaultCriteria);
 
-
   // ✅ Default weights now 20%
   const [weights, setWeights] = useState(
     Object.fromEntries(defaultCriteria.map((c) => [c, 20]))
@@ -22,6 +22,11 @@ export default function App() {
     { ...defaultOpp(defaultCriteria), name: "Hispanic Cheese @ Walmart" },
     { ...defaultOpp(defaultCriteria), name: "Value Gouda (<$5)" },
   ]);
+
+  // ✅ AI state
+  const [insights, setInsights] = useState("");
+  const [loading, setLoading] = useState(false);
+
 
   const updateValue = (index, field, value) => {
     const updated = [...opps];
@@ -50,7 +55,6 @@ export default function App() {
     setWeights(newWeights);
   };
 
-  // ✅ Fix input bug + prevent leading zero issue
   const updateWeight = (key, value) => {
     const clean = value.replace(/^0+(?=\d)/, "");
     setWeights({ ...weights, [key]: Number(clean || 0) });
@@ -59,10 +63,7 @@ export default function App() {
   const addCriteria = () => {
     const newKey = `Criteria ${criteria.length + 1}`;
     setCriteria([...criteria, newKey]);
-
-    // ✅ new criteria defaults to 20%
     setWeights({ ...weights, [newKey]: 20 });
-
 
     const updatedOpps = opps.map((opp) => ({
       ...opp,
@@ -98,9 +99,7 @@ export default function App() {
     setOpps(opps.filter((_, i) => i !== index));
   };
 
-  // ✅ Normalize weights so total always behaves like % (sums to 1)
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0) || 1;
-
 
   const scoredOpps = opps.map((opp) => {
     const total = criteria.reduce((sum, c) => {
@@ -108,11 +107,34 @@ export default function App() {
       return sum + (opp[c] || 0) * weightNormalized * criteria.length;
     }, 0);
 
-
     return { ...opp, total: Number(total.toFixed(2)) };
   });
 
   const ranked = [...scoredOpps].sort((a, b) => b.total - a.total);
+
+  // ✅ Call AI API
+  const generateInsights = async () => {
+    setLoading(true);
+
+
+    const response = await fetch("/api/ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        criteria,
+        weights,
+        opportunities: ranked,
+      }),
+    });
+
+
+    const data = await response.json();
+    setInsights(data.text);
+    setLoading(false);
+  };
+
 
   const exportToCSV = () => {
     const headers = ["Opportunity", ...criteria, "Total"];
@@ -125,7 +147,8 @@ export default function App() {
 
     const csvContent = [headers, ...rows]
       .map((row) => row.join(","))
-      .join("\n");
+      .join("
+");
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -241,7 +264,10 @@ export default function App() {
         <button onClick={removeCriteria} style={{ marginRight: 10 }}>
           − Remove Criteria
         </button>
-        <button onClick={exportToCSV}>Export to Excel</button>
+        <button onClick={exportToCSV} style={{ marginRight: 10 }}>
+          Export to Excel
+        </button>
+        <button onClick={generateInsights}>Generate AI Insights</button>
       </div>
 
       <div style={{ marginTop: 30 }}>
@@ -263,6 +289,25 @@ export default function App() {
             <strong>{opp.total}</strong>
           </div>
         ))}
+      </div>
+
+
+      {/* AI OUTPUT */}
+      <div style={{ marginTop: 30 }}>
+        <h2>AI Insights</h2>
+        {loading && <p>Generating insights...</p>}
+        {insights && (
+          <div
+            style={{
+              background: "#eef2ff",
+              padding: 15,
+              borderRadius: 8,
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {insights}
+          </div>
+        )}
       </div>
     </div>
   );

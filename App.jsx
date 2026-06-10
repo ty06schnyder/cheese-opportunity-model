@@ -147,8 +147,7 @@ export default function App() {
 
     const csvContent = [headers, ...rows]
       .map((row) => row.join(","))
-      .join("
-");
+      .join("\n");
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");

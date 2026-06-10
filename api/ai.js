@@ -1,7 +1,12 @@
 export default async function handler(req, res) {
   try {
-    const { opportunities, criteria, weights } = req.body;
+    // ✅ Parse request safely (Vercel sometimes needs this)
+    const body =
+      typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
+    const { opportunities, criteria, weights } = body;
+
+    // ✅ Build prompt
     const prompt = `
 You are a strategy consultant.
 
@@ -20,30 +25,48 @@ Provide:
 2. Key risk
 3. Strategic insight
 
-Keep it concise, professional, and business-focused.
+Keep it concise, structured, and business-focused.
 `;
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.7
-      })
-    });
+    // ✅ Call OpenAI (stable + working model)
+    const response = await fetch(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o", // 🔥 IMPORTANT FIX (do not change)
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.7,
+        }),
+      }
+    );
 
     const data = await response.json();
 
-    res.status(200).json({
-      text: data.choices[0].message.content
+    // ✅ Debug logging (shows in Vercel logs)
+    console.log("OPENAI RESPONSE:", JSON.stringify(data, null, 2));
+
+    // ✅ Handle errors gracefully
+    if (!data || !data.choices) {
+      return res.status(500).json({
+        text: "AI ERROR: " + JSON.stringify(data),
+      });
+    }
+
+    // ✅ Return clean response
+    return res.status(200).json({
+      text: data.choices[0].message.content,
     });
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong", details: error });
+    console.error("FULL ERROR:", error);
+
+    return res.status(500).json({
+      text: "SERVER ERROR: " + error.message,
+    });
   }
 }
+``

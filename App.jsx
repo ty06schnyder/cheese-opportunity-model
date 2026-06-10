@@ -1,9 +1,6 @@
 
 
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 const defaultOpp = {
   name: "",
@@ -47,7 +44,6 @@ export default function App() {
 
   const ranked = [...scoredOpps].sort((a, b) => b.total - a.total);
 
-  // ✅ CSV Export Function (works like Excel when opened)
   const exportToCSV = () => {
     const headers = [
       "Opportunity",
@@ -59,7 +55,6 @@ export default function App() {
       "Total",
     ];
 
-
     const rows = ranked.map((opp) => [
       opp.name,
       opp.growth,
@@ -70,17 +65,12 @@ export default function App() {
       opp.total,
     ]);
 
-
-    const csvContent =
-      [headers, ...rows]
-        .map((row) => row.join(","))
-        .join("
-");
-
+    const csvContent = [headers, ...rows]
+      .map((row) => row.join(","))
+      .join("\n");
 
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-
 
     const link = document.createElement("a");
     link.href = url;
@@ -90,65 +80,71 @@ export default function App() {
     document.body.removeChild(link);
   };
 
-
   return (
-    <div className="p-6 grid gap-6">
-      <h1 className="text-2xl font-bold">AI Opportunity Scoring Model</h1>
+    <div style={{ padding: 24, fontFamily: "Arial, sans-serif" }}>
+      <h1>AI Opportunity Scoring Model</h1>
 
-      <Card>
-        <CardContent className="p-4 grid gap-4">
-          {opps.map((opp, i) => (
-            <div key={i} className="grid grid-cols-6 gap-2 items-center">
-              <Input
-                placeholder="Opportunity name"
-                value={opp.name}
-                onChange={(e) => updateValue(i, "name", e.target.value)}
-              />
+      <div style={{ border: "1px solid #ccc", padding: 16, marginBottom: 20 }}>
+        {opps.map((opp, i) => (
+          <div
+            key={i}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "2fr repeat(5, 1fr) auto",
+              gap: 8,
+              marginBottom: 10,
+              alignItems: "center",
+            }}
+          >
+            <input
+              placeholder="Opportunity name"
+              value={opp.name}
+              onChange={(e) => updateValue(i, "name", e.target.value)}
+            />
+            {["growth", "impact", "ease", "competition", "trend"].map(
+              (field) => (
+                <input
+                  key={field}
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={opp[field]}
+                  onChange={(e) => updateValue(i, field, e.target.value)}
+                />
+              )
+            )}
 
-              {["growth", "impact", "ease", "competition", "trend"].map(
-                (field) => (
-                  <input
-                    key={field}
-                    type="range"
-                    min="1"
-                    max="5"
-                    value={opp[field]}
-                    onChange={(e) =>
-                      updateValue(i, field, e.target.value)
-                    }
-                  />
-                )
-              )}
-
-              <Button variant="destructive" onClick={() => removeOpportunity(i)}>
-                X
-              </Button>
-            </div>
-          ))}
-
-          <div className="flex gap-3">
-            <Button onClick={addOpportunity}>Add Opportunity</Button>
-            <Button onClick={exportToCSV}>Export to Excel</Button>
+            <button onClick={() => removeOpportunity(i)}>Delete</button>
           </div>
-        </CardContent>
-      </Card>
+        ))}
 
-      <Card>
-        <CardContent className="p-4">
-          <h2 className="text-xl font-semibold mb-3">Ranked Opportunities</h2>
-          <div className="grid gap-2">
-            {ranked.map((opp, i) => (
-              <div
-                key={i}
-                className="flex justify-between bg-gray-100 p-2 rounded-xl"
-              >
-                <span>{opp.name || "Unnamed"}</span>
-                <span className="font-bold">{opp.total}</span>
-              </div>
-            ))}
+        <div style={{ marginTop: 10 }}>
+          <button onClick={addOpportunity} style={{ marginRight: 10 }}>
+            Add Opportunity
+          </button>
+          <button onClick={exportToCSV}>Export to Excel</button>
+        </div>
+      </div>
+
+
+      <div style={{ border: "1px solid #ccc", padding: 16 }}>
+        <h2>Ranked Opportunities</h2>
+        {ranked.map((opp, i) => (
+          <div
+            key={i}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              background: "#f3f3f3",
+              padding: 8,
+              marginBottom: 6,
+            }}
+          >
+            <span>{opp.name || "Unnamed"}</span>
+            <strong>{opp.total}</strong>
           </div>
-        </CardContent>
-      </Card>
+        ))}
+      </div>
     </div>
   );
 }

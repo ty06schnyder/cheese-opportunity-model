@@ -8,24 +8,45 @@ export default async function handler(req, res) {
 
     // ✅ Build prompt
     const prompt = `
-You are a strategy consultant.
+You are a strategy consultant preparing a recommendation for business leadership.
 
-Analyze these business opportunities:
+Analyze the following opportunities:
 
 ${JSON.stringify(opportunities, null, 2)}
 
-Criteria:
+Scoring criteria:
 ${criteria.join(", ")}
 
 Weights:
 ${JSON.stringify(weights)}
 
-Provide:
-1. Top recommendation (and why)
-2. Key risk
-3. Strategic insight
+Your output must follow this EXACT format:
 
-Keep it concise, structured, and business-focused.
+Top Opportunity:
+[Name of top opportunity]
+
+Where to Focus:
+[1–2 sentences on where to prioritize effort]
+
+What to Do:
+- Action 1
+- Action 2
+- Action 3
+
+Why It Matters:
+[2–3 sentences explaining the business impact and reasoning]
+
+Second Priority:
+[Name of second best opportunity]
+
+Key Risk:
+[1–2 sentences]
+
+Rules:
+- Do NOT use any markdown symbols (**, #, etc.)
+- Do NOT include headings formatting
+- Keep it concise, clear, and executive-ready
+- Focus on actionable insights, not descriptions
 `;
 
     // ✅ Call OpenAI (stable + working model)

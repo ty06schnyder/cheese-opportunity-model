@@ -1,3 +1,5 @@
+
+
 import React, { useState } from "react";
 
 const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
@@ -11,6 +13,7 @@ const defaultOpp = (criteria) => {
 export default function App() {
   const [criteria, setCriteria] = useState(defaultCriteria);
 
+  // ✅ Default weights now 20%
   const [weights, setWeights] = useState(
     Object.fromEntries(defaultCriteria.map((c) => [c, 20]))
   );
@@ -20,8 +23,10 @@ export default function App() {
     { ...defaultOpp(defaultCriteria), name: "Value Gouda (<$5)" },
   ]);
 
+  // ✅ AI state
   const [insights, setInsights] = useState("");
   const [loading, setLoading] = useState(false);
+
 
   const updateValue = (index, field, value) => {
     const updated = [...opps];
@@ -68,7 +73,9 @@ export default function App() {
   };
 
   const removeCriteria = () => {
+    if (criteria.length === 0) return;
     const last = criteria[criteria.length - 1];
+
     setCriteria(criteria.slice(0, -1));
 
     const newWeights = { ...weights };
@@ -96,32 +103,42 @@ export default function App() {
 
   const scoredOpps = opps.map((opp) => {
     const total = criteria.reduce((sum, c) => {
-      const w = (weights[c] || 0) / totalWeight;
-      return sum + (opp[c] || 0) * w * criteria.length;
+      const weightNormalized = (weights[c] || 0) / totalWeight;
+      return sum + (opp[c] || 0) * weightNormalized * criteria.length;
     }, 0);
+
     return { ...opp, total: Number(total.toFixed(2)) };
   });
 
   const ranked = [...scoredOpps].sort((a, b) => b.total - a.total);
 
+  // ✅ Call AI API
   const generateInsights = async () => {
     setLoading(true);
+
 
     const response = await fetch("/api/ai", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ criteria, weights, opportunities: ranked }),
+      body: JSON.stringify({
+        criteria,
+        weights,
+        opportunities: ranked,
+      }),
     });
+
 
     const data = await response.json();
     setInsights(data.text);
     setLoading(false);
   };
 
+
   const exportToCSV = () => {
     const headers = ["Opportunity", ...criteria, "Total"];
+
     const rows = ranked.map((opp) => [
       opp.name,
       ...criteria.map((c) => opp[c]),
@@ -131,10 +148,8 @@ export default function App() {
     const csvContent = [headers, ...rows]
       .map((row) => row.join(","))
       .join("\n");
-
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-
     const link = document.createElement("a");
     link.href = url;
     link.download = "opportunity_model.csv";
@@ -150,57 +165,47 @@ export default function App() {
   };
 
   return (
-    <div
-      style={{
-        padding: 40,
-        fontFamily: "Inter, Arial",
-        background: "#f6f8fb",
-        minHeight: "100vh",
-      }}
-    >
-      <h1 style={{ fontSize: 28, fontWeight: 600, color: "#1f2937" }}>
+    <div style={{ padding: 30, fontFamily: "Inter, Arial, sans-serif" }}>
+      <h1 style={{ marginBottom: 20 }}>
         Opportunity Prioritization Model
       </h1>
 
       <div
-        style={{
-          marginTop: 20,
-          background: "white",
-          borderRadius: 12,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-          overflow: "hidden",
-        }}
+        style={{ border: "1px solid #ddd", borderRadius: 8, overflow: "hidden" }}
       >
         {/* Header */}
         <div
           style={{
             display: "grid",
             gridTemplateColumns: `2fr repeat(${criteria.length}, 1fr 0.8fr) auto`,
-            background: "#f9fafb",
-            padding: 12,
+            background: "#f7f7f7",
+            padding: 10,
             fontWeight: "bold",
           }}
         >
           <div>Opportunity</div>
 
           {criteria.map((c, i) => (
-            <React.Fragment key={i}>
+            <>
               <input
+                key={`name-${i}`}
                 value={c}
                 onChange={(e) => updateCriteria(i, e.target.value)}
-                style={{ border: "1px solid #ddd", borderRadius: 6 }}
+                style={{ width: "100%" }}
               />
-              <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
                 <input
+                  type="text"
                   value={weights[c]}
                   onChange={(e) => updateWeight(c, e.target.value)}
-                  style={{ width: 50 }}
+                  style={{ width: "50px" }}
                 />
                 %
               </div>
-            </React.Fragment>
+            </>
           ))}
-          <div />
+
+          <div></div>
         </div>
 
         {/* Rows */}
@@ -210,31 +215,37 @@ export default function App() {
             style={{
               display: "grid",
               gridTemplateColumns: `2fr repeat(${criteria.length}, 1fr 0.8fr) auto`,
-              padding: 12,
+              padding: 10,
               borderTop: "1px solid #eee",
+              alignItems: "center",
             }}
           >
             <input
               value={opp.name}
+              placeholder="Opportunity"
               onChange={(e) => updateValue(i, "name", e.target.value)}
             />
 
             {criteria.map((c) => (
-              <React.Fragment key={c}>
+              <>
                 <input
+                  key={`score-${c}`}
                   type="number"
-                  value={opp[c]}
                   min="1"
                   max="5"
+                  value={opp[c]}
                   onChange={(e) => updateValue(i, c, e.target.value)}
                   style={{
+                    width: "60px",
                     background: getColor(opp[c]),
                     color: "white",
-                    borderRadius: 6,
+                    border: "none",
+                    borderRadius: 4,
+                    padding: 2,
                   }}
                 />
-                <div />
-              </React.Fragment>
+                <div></div>
+              </>
             ))}
 
             <button onClick={() => removeOpportunity(i)}>✕</button>
@@ -242,21 +253,22 @@ export default function App() {
         ))}
       </div>
 
-      {/* Buttons */}
-      <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
-        <button onClick={addOpportunity}>+ Opportunity</button>
-        <button onClick={addCriteria}>+ Criteria</button>
-        <button onClick={removeCriteria}>− Criteria</button>
-        <button onClick={exportToCSV}>Export</button>
-        <button
-          onClick={generateInsights}
-          style={{ background: "#2563eb", color: "white" }}
-        >
-          AI Insights
+      <div style={{ marginTop: 15 }}>
+        <button onClick={addOpportunity} style={{ marginRight: 10 }}>
+          + Add Opportunity
         </button>
+        <button onClick={addCriteria} style={{ marginRight: 10 }}>
+          + Add Criteria
+        </button>
+        <button onClick={removeCriteria} style={{ marginRight: 10 }}>
+          − Remove Criteria
+        </button>
+        <button onClick={exportToCSV} style={{ marginRight: 10 }}>
+          Export to Excel
+        </button>
+        <button onClick={generateInsights}>Generate AI Insights</button>
       </div>
 
-      {/* Ranking */}
       <div style={{ marginTop: 30 }}>
         <h2>Ranked Opportunities</h2>
         {ranked.map((opp, i) => (
@@ -265,30 +277,31 @@ export default function App() {
             style={{
               display: "flex",
               justifyContent: "space-between",
-              padding: 12,
-              background: "white",
-              borderRadius: 8,
+              padding: 10,
+              background: "#f2f4f7",
               marginBottom: 6,
-              borderLeft: `6px solid ${getColor(opp.total)}`,
+              borderRadius: 6,
+              borderLeft: `6px solid ${getColor(Math.round(opp.total))}`,
             }}
           >
-            <span>{opp.name}</span>
+            <span>{opp.name || "Unnamed"}</span>
             <strong>{opp.total}</strong>
           </div>
         ))}
       </div>
 
-      {/* AI */}
+
+      {/* AI OUTPUT */}
       <div style={{ marginTop: 30 }}>
         <h2>AI Insights</h2>
-        {loading && <p>Generating...</p>}
+        {loading && <p>Generating insights...</p>}
         {insights && (
           <div
             style={{
-              background: "white",
-              padding: 16,
-              borderRadius: 10,
-              lineHeight: 1.6,
+              background: "#eef2ff",
+              padding: 15,
+              borderRadius: 8,
+              whiteSpace: "pre-wrap",
             }}
           >
             {insights}

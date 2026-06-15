@@ -423,9 +423,16 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
           <div style={{ marginTop: 20 }}>
             {loading && <p>Generating insights...</p>}
             {insights && (
-              <div style={{ background: "white", padding: 16 }}>
-                {insights}
-              </div>
+              <div
+  style={{
+    background: "white",
+    padding: 16,
+    whiteSpace: "pre-line", // ✅ THIS FIXES EVERYTHING
+    lineHeight: 1.6,
+  }}
+>
+  {insights}
+</div>
             )}
           </div>
         </>

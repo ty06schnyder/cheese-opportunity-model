@@ -56,33 +56,102 @@ export default function App() {
   };
 
   // ✅ IMPORT CSV
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
+  if (!file.name.endsWith(".csv")) {
+    alert("Please upload a CSV file");
+    return;
+  }
+
   const reader = new FileReader();
 
-  reader.onload = (event) => {
+  reader.onload = async (event) => {
     const text = event.target.result;
 
     const rows = text
       .split("\n")
       .map((r) =>
-        r.split(",").map((cell) => cell.replace(/"/g, "").trim())
+        r
+          .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/) // ✅ handles commas in numbers
+          .map((cell) => cell.replace(/"/g, "").trim())
       )
       .filter((r) => r.length > 1 && r[0]);
 
     if (rows.length < 2) {
       alert("Invalid CSV format");
-      return; 
+      return;
     }
 
-    const parsed = rows[0].map((header, i) => ({
-      name: header,
-      value: rows[1][i] || "",
-    }));
+    const headers = rows[0];
+    const dataRows = rows.slice(1);
 
-    setMetrics(parsed);
+    const newOpps = [];
+
+    // ✅ Process each product row
+    for (let row of dataRows) {
+      let productName = "";
+
+      const metrics = headers
+        .map((header, i) => {
+          const cleanHeader = header.toLowerCase();
+
+          // ✅ Extract product name
+          if (cleanHeader.includes("product")) {
+            productName = (row[i] || "").trim();
+            return null;
+          }
+
+          return {
+            name: header,
+            value: (row[i] || "").replace(/,/g, "").trim(), // ✅ fixes 12,731
+          };
+        })
+        .filter(Boolean);
+
+      // ✅ Skip empty rows
+      if (!productName) continue;
+
+      try {
+        // ✅ Call AI to convert metrics → scores
+        const res = await fetch("/api/ai", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "mapping",
+            metrics,
+            criteria,
+          }),
+        });
+
+        const data = await res.json();
+
+        let cleaned = data.text?.trim() || "";
+        cleaned = cleaned.replace(/```json/g, "").replace(/```/g, "");
+
+        const scores = JSON.parse(cleaned);
+
+        const newOpp = { name: productName };
+
+        criteria.forEach((c) => {
+          newOpp[c] = scores[c] || 3;
+        });
+
+        newOpps.push(newOpp);
+
+      } catch (err) {
+        console.log("Skipping row due to error:", err);
+      }
+    }
+
+    // ✅ Add ALL opportunities at once
+    setOpps((prev) => [...prev, ...newOpps]);
+
+    // ✅ Go straight to model tab
+    setTab("model");
   };
 
   reader.readAsText(file);

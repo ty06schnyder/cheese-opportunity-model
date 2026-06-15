@@ -23,6 +23,7 @@ export default function App() {
   );
 
   const [opps, setOpps] = useState([]);
+  const [editing, setEditing] = useState(null);
 
   const [metrics, setMetrics] = useState([{ name: "", value: "" }]);
   const [name, setName] = useState("");
@@ -199,11 +200,15 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
       const scores = JSON.parse(cleaned);
 
       const updateScore = (index, criteriaName, value) => {
-        const updated = [...opps];
+  let num = Number(value);
 
-        updated[index][criteriaName] = Number(value);
+  if (num > 5) num = 5;
+  if (num < 1) num = 1;
 
-        setOpps(updated);
+  const updated = [...opps];
+  updated[index][criteriaName] = num;
+
+  setOpps(updated);
 };
 
       
@@ -434,37 +439,43 @@ const chartOptions = {
                 <div style={{ display: "flex", gap: 10 }}>
                   {criteria.map((c) => (
                     <div
+  onClick={() => setEditing(`${i}-${c}`)}
   style={{
     background: getColor(opp[c]),
     color: "white",
     padding: 6,
     borderRadius: 6,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
     minWidth: 60,
+    textAlign: "center",
+    cursor: "pointer",
   }}
 >
-  <span style={{ fontSize: 10 }}>{c}</span>
-
-  <input
-    type="number"
-    min="1"
-    max="5"
-    value={opp[c]}
-    onChange={(e) =>
-      updateScore(i, c, e.target.value)
-    }
-    style={{
-      width: 40,
-      border: "none",
-      background: "transparent",
-      color: "white",
-      textAlign: "center",
-      fontWeight: "bold",
-      fontSize: 14,
-    }}
-  />
+  {editing === `${i}-${c}` ? (
+    <input
+      type="number"
+      min="1"
+      max="5"
+      autoFocus
+      value={opp[c]}
+      onChange={(e) =>
+        updateScore(i, c, e.target.value)
+      }
+      onBlur={() => setEditing(null)}
+      style={{
+        width: "100%",
+        border: "none",
+        background: "transparent",
+        color: "white",
+        textAlign: "center",
+        fontWeight: "bold",
+        outline: "none",
+      }}
+    />
+  ) : (
+    <span>
+      {c}: {opp[c]}
+    </span>
+  )}
 </div>
                   ))}
                 </div>

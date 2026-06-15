@@ -57,28 +57,82 @@ export default function App() {
 
   // ✅ IMPORT CSV
   const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const file = e.target.files[0];
+  if (!file) return;
 
-    const reader = new FileReader();
+  const reader = new FileReader();
 
-    reader.onload = (event) => {
-      const text = event.target.result;
-      const rows = text.split("\n").map((r) => r.split(","));
+  reader.onload = (event) => {
+    const text = event.target.result;
 
-      const headers = rows[0];
-      const values = rows[1];
+    const rows = text.split("\n").map((r) => r.split(","));
 
-      const parsed = headers.map((h, i) => ({
-        name: h.trim(),
-        value: values[i]?.trim(),
-      }));
+    const headers = rows[0];
 
-      setMetrics(parsed);
-    };
+    // find key columns
+    const productIndex = headers.findIndex((h) =>
+      h.toLowerCase().includes("product")
+    );
 
-    reader.readAsText(file);
+    const timeIndex = headers.findIndex((h) =>
+      h.toLowerCase().includes("time")
+    );
+
+    const geoIndex = headers.findIndex((h) =>
+      h.toLowerCase().includes("geography")
+    );
+
+    // metric columns = everything else numeric
+    const metricIndexes = headers
+      .map((h, i) =>
+        i !== productIndex && i !== timeIndex && i !== geoIndex ? i : null
+      )
+      .filter((i) => i !== null);
+
+    // group by product
+    const productMap = {};
+
+    rows.slice(1).forEach((row) => {
+      const rawName = row[productIndex];
+      if (!rawName) return;
+
+      // shorten product name
+      const shortName = rawName.split(" ")[0] + " " + rawName.split(" ")[1];
+
+      if (!productMap[shortName]) {
+        productMap[shortName] = {
+          name: shortName,
+          metrics: [],
+        };
+      }
+
+      metricIndexes.forEach((i) => {
+        const metricName = headers[i];
+        const value = row[i];
+
+        if (!value) return;
+
+        productMap[shortName].metrics.push({
+          name: metricName,
+          value: value,
+        });
+      });
+    });
+
+    // convert to array
+    const parsedProducts = Object.values(productMap);
+
+    console.log("PARSED PRODUCTS:", parsedProducts);
+
+    // ✅ set FIRST product for now (we’ll expand next)
+    if (parsedProducts.length > 0) {
+      setName(parsedProducts[0].name);
+      setMetrics(parsedProducts[0].metrics);
+    }
   };
+
+  reader.readAsText(file);
+};
 
   // ✅ CONVERT METRICS → AI SCORES
   const convertToOpportunity = async () => {

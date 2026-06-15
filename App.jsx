@@ -211,7 +211,21 @@ export default function App() {
             {criteria.map((c) => (
               <span key={c} style={{ marginRight: 8 }}>
                 {c}
-                <button onClick={() => removeCriteria(c)}>✕</button>
+                <button
+  onClick={() => removeCriteria(c)}
+  style={{
+    marginLeft: 4,
+    fontSize: "10px",
+    lineHeight: 1,
+    padding: "2px 4px",
+    borderRadius: 4,
+    border: "none",
+    background: "#e5e7eb",
+    cursor: "pointer",
+  }}
+>
+  ✕
+</button>
               </span>
             ))}
             <button onClick={addCriteria}>+ Add</button>

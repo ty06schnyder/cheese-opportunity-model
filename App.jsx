@@ -198,6 +198,15 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
 
       const scores = JSON.parse(cleaned);
 
+      const updateScore = (index, criteriaName, value) => {
+        const updated = [...opps];
+
+        updated[index][criteriaName] = Number(value);
+
+        setOpps(updated);
+};
+
+      
       const newOpp = { name };
 
       criteria.forEach((c) => {
@@ -425,16 +434,38 @@ const chartOptions = {
                 <div style={{ display: "flex", gap: 10 }}>
                   {criteria.map((c) => (
                     <div
-                      key={c}
-                      style={{
-                        background: getColor(opp[c]),
-                        color: "white",
-                        padding: 5,
-                        borderRadius: 6,
-                      }}
-                    >
-                      {c}: {opp[c]}
-                    </div>
+  style={{
+    background: getColor(opp[c]),
+    color: "white",
+    padding: 6,
+    borderRadius: 6,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    minWidth: 60,
+  }}
+>
+  <span style={{ fontSize: 10 }}>{c}</span>
+
+  <input
+    type="number"
+    min="1"
+    max="5"
+    value={opp[c]}
+    onChange={(e) =>
+      updateScore(i, c, e.target.value)
+    }
+    style={{
+      width: 40,
+      border: "none",
+      background: "transparent",
+      color: "white",
+      textAlign: "center",
+      fontWeight: "bold",
+      fontSize: 14,
+    }}
+  />
+</div>
                   ))}
                 </div>
               </div>

@@ -34,8 +34,15 @@ Rules:
 - Do NOT explain anything
 - Do NOT use markdown
 
-Output EXACTLY like:
-{"Growth":3,"Impact":4,"Ease":2,"Competition":3,"Trend":3}
+Return ONLY JSON with ALL criteria:
+
+Keys must match exactly:
+${body.criteria.join(", ")}
+
+Example:
+{
+  ${body.criteria.map((c) => `"${c}": number`).join(",")}
+}
 `;
     }
 

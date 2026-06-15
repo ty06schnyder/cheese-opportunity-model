@@ -5,7 +5,7 @@ export default async function handler(req, res) {
         ? JSON.parse(req.body)
         : req.body || {};
 
-    let prompt = ""; 
+    let prompt = "";  
 
     // ✅ =========================
     // ✅ MODE 1: METRICS → SCORES

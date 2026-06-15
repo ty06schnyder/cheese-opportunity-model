@@ -6,7 +6,7 @@ const defaultOpp = (criteria) => {
   const base = { name: "" };
   criteria.forEach((c) => (base[c] = 3));
   return base;
-};
+}; 
 
 export default function App() {
   const [tab, setTab] = useState("input");

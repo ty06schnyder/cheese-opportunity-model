@@ -207,29 +207,57 @@ export default function App() {
       {tab === "model" && (
         <>
           {/* Criteria controls */}
-          <div style={{ marginBottom: 10 }}>
-            {criteria.map((c) => (
-              <span key={c} style={{ marginRight: 8 }}>
-                {c}
-                <button
-  onClick={() => removeCriteria(c)}
-  style={{
-    marginLeft: 4,
-    fontSize: "10px",
-    lineHeight: 1,
-    padding: "2px 4px",
-    borderRadius: 4,
-    border: "none",
-    background: "#e5e7eb",
-    cursor: "pointer",
-  }}
->
-  ✕
-</button>
-              </span>
-            ))}
-            <button onClick={addCriteria}>+ Add</button>
-          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+  {criteria.map((c) => (
+    <div
+      key={c}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        background: "#f3f4f6",
+        padding: "5px 10px",
+        borderRadius: 10,
+        fontSize: "12px",
+      }}
+    >
+      <span>{c}</span>
+
+      <button
+        onClick={() => removeCriteria(c)}
+        style={{
+          fontSize: "10px",
+          width: 16,
+          height: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "50%",
+          border: "none",
+          background: "#e5e7eb",
+          cursor: "pointer",
+          padding: 0,
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  ))}
+
+  <button
+    onClick={addCriteria}
+    style={{
+      padding: "5px 10px",
+      borderRadius: 10,
+      border: "1px dashed #d1d5db",
+      background: "white",
+      cursor: "pointer",
+      fontSize: "12px",
+    }}
+  >
+    + Add
+  </button>
+</div>
 
           {/* Opportunities */}
           <div style={{ background: "white", padding: 20 }}>

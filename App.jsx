@@ -241,23 +241,25 @@ export default function App() {
     </div>
 
     {/* AI OUTPUT */}
-    <div style={{ marginTop: 20 }}>
-      {loading && <p>Generating insights...</p>}
+      <div style={{ marginTop: 20 }}>
+        {loading && <p>Generating insights...</p>}
 
-      {insights && (
-        <div
-          style={{
-            background: "white",
-            padding: 16,
-            borderRadius: 10,
-            lineHeight: 1.6,
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          {insights}
-        </div>
-      )}
-    </div>
-  </>
+        {insights && (
+          <div
+            style={{
+              background: "white",
+              padding: 16,
+              borderRadius: 10,
+              lineHeight: 1.6,
+              border: "1px solid #e5e7eb",
+            }}
+          >
+            {insights}
+          </div>
+        )}
+      </div>
+    </>
+  )}
+</div>
 );
 }

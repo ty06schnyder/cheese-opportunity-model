@@ -8,48 +8,8 @@ const defaultOpp = (criteria) => {
   return base;
 };
 
-// ⚡ Conversion Logic
-const convertToScores = ({ stores, price, sales }) => {
-  // Growth (Dollar Sales)
-  let growth =
-    sales < 1e6
-      ? 1
-      : sales < 5e6
-      ? 2
-      : sales < 10e6
-      ? 3
-      : sales < 25e6
-      ? 4
-      : 5;
-
-  // Impact (# Stores)
-  let impact =
-    stores < 500
-      ? 1
-      : stores < 2000
-      ? 2
-      : stores < 5000
-      ? 3
-      : stores < 10000
-      ? 4
-      : 5;
-
-  // Ease (Price)
-  let ease =
-    price > 9 ? 1 :
-    price > 7 ? 2 :
-    price > 5 ? 3 :
-    price > 3 ? 4 : 5;
-
-  let competition = 6 - impact;
-  let trend = 3;
-
-  return { growth, impact, ease, competition, trend };
-};
-
 export default function App() {
-  const [activeTab, setActiveTab] = useState("circana");
-
+  const [tab, setTab] = useState("input");
   const [criteria, setCriteria] = useState(defaultCriteria);
 
   const [weights, setWeights] = useState(
@@ -58,65 +18,92 @@ export default function App() {
 
   const [opps, setOpps] = useState([]);
 
-  const [circanaInput, setCircanaInput] = useState({
-    name: "",
-    stores: "",
-    price: "",
-    sales: "",
-  });
+  const [metrics, setMetrics] = useState([{ name: "", value: "" }]);
+  const [name, setName] = useState("");
 
   const [insights, setInsights] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Add from Circana
-  const addFromCircana = () => {
-    const { name, stores, price, sales } = circanaInput;
-
-    if (!name || !stores || !price || !sales) return;
-
-    const scores = convertToScores({
-      stores: Number(stores),
-      price: Number(price),
-      sales: Number(sales),
-    });
-
-    const newOpp = { name };
-
-    criteria.forEach((c) => {
-      newOpp[c] = scores[c.toLowerCase()] || 3;
-    });
-
-    setOpps([...opps, newOpp]);
-
-    setCircanaInput({ name: "", stores: "", price: "", sales: "" });
-    setActiveTab("model");
+  // ✅ Add metric row
+  const addMetric = () => {
+    setMetrics([...metrics, { name: "", value: "" }]);
   };
 
-  const updateValue = (i, field, value) => {
-    const updated = [...opps];
-    updated[i][field] =
-      field === "name" ? value : Number(value);
-    setOpps(updated);
+  // ✅ Update metric
+  const updateMetric = (i, field, value) => {
+    const updated = [...metrics];
+    updated[i][field] = value;
+    setMetrics(updated);
   };
 
+  // ✅ AI mapping METRICS → SCORES
+  const convertToOpportunity = async () => {
+    if (!name) return;
+
+    setLoading(true);
+
+    const response = await fetch("/api/ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: "mapping",
+        metrics,
+        criteria,
+      }),
+    });
+
+    const data = await response.json();
+    setLoading(false);
+
+    try {
+      const scores = JSON.parse(data.text);
+
+      const newOpp = { name };
+
+      criteria.forEach((c) => {
+        newOpp[c] = scores[c] || 3;
+      });
+
+      setOpps([...opps, newOpp]);
+      setTab("model");
+
+      setMetrics([{ name: "", value: "" }]);
+      setName("");
+    } catch (e) {
+      alert("AI parsing failed. Try again.");
+    }
+  };
+
+  // ✅ scoring logic
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0) || 1;
 
   const scored = opps.map((opp) => {
-    const total = criteria.reduce((sum, c) => {
-      return sum + ((opp[c] || 0) * weights[c]) / totalWeight;
-    }, 0);
+    const total = criteria.reduce(
+      (sum, c) => sum + (opp[c] * weights[c]) / totalWeight,
+      0
+    );
     return { ...opp, total: Number((total * criteria.length).toFixed(2)) };
   });
 
   const ranked = [...scored].sort((a, b) => b.total - a.total);
 
+  // ✅ AI insights
   const generateInsights = async () => {
     setLoading(true);
 
     const res = await fetch("/api/ai", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ criteria, weights, opportunities: ranked }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: "insights",
+        criteria,
+        weights,
+        opportunities: ranked,
+      }),
     });
 
     const data = await res.json();
@@ -125,10 +112,15 @@ export default function App() {
   };
 
   const getColor = (v) =>
-    v >= 5 ? "#16a34a" :
-    v >= 4 ? "#4ade80" :
-    v >= 3 ? "#facc15" :
-    v >= 2 ? "#fb923c" : "#ef4444";
+    v >= 5
+      ? "#16a34a"
+      : v >= 4
+      ? "#4ade80"
+      : v >= 3
+      ? "#facc15"
+      : v >= 2
+      ? "#fb923c"
+      : "#ef4444";
 
   return (
     <div style={{ padding: 40, background: "#f6f8fb", minHeight: "100vh" }}>
@@ -136,62 +128,96 @@ export default function App() {
 
       {/* Tabs */}
       <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-        <button onClick={() => setActiveTab("circana")}>Circana Input</button>
-        <button onClick={() => setActiveTab("model")}>Model</button>
+        <button onClick={() => setTab("input")}>Data Input</button>
+        <button onClick={() => setTab("model")}>Model</button>
       </div>
 
-      {/* CIRCANA TAB */}
-      {activeTab === "circana" && (
+      {/* INPUT TAB */}
+      {tab === "input" && (
         <div style={{ background: "white", padding: 20, borderRadius: 10 }}>
-          <h2>Enter Circana Data</h2>
+          <h2>Enter Metrics</h2>
 
-          <input placeholder="Product Name"
-            value={circanaInput.name}
-            onChange={(e) =>
-              setCircanaInput({ ...circanaInput, name: e.target.value })}
+          <input
+            placeholder="Opportunity Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={{ display: "block", marginBottom: 10 }}
           />
 
-          <input placeholder="# Stores"
-            value={circanaInput.stores}
-            onChange={(e) =>
-              setCircanaInput({ ...circanaInput, stores: e.target.value })}
-          />
+          {metrics.map((m, i) => (
+            <div key={i} style={{ display: "flex", gap: 10, marginBottom: 8 }}>
+              <input
+                placeholder="Metric Name"
+                value={m.name}
+                onChange={(e) => updateMetric(i, "name", e.target.value)}
+              />
+              <input
+                placeholder="Value"
+                value={m.value}
+                onChange={(e) => updateMetric(i, "value", e.target.value)}
+              />
+            </div>
+          ))}
 
-          <input placeholder="Price ($)"
-            value={circanaInput.price}
-            onChange={(e) =>
-              setCircanaInput({ ...circanaInput, price: e.target.value })}
-          />
+          <button onClick={addMetric}>+ Add Metric</button>
 
-          <input placeholder="Dollar Sales ($)"
-            value={circanaInput.sales}
-            onChange={(e) =>
-              setCircanaInput({ ...circanaInput, sales: e.target.value })}
-          />
+          <div style={{ marginTop: 20 }}>
+            <button onClick={convertToOpportunity}>
+              Convert to Opportunity
+            </button>
+          </div>
 
-          <button onClick={addFromCircana}>
-            Add Opportunity
-          </button>
+          {loading && <p>AI processing metrics...</p>}
         </div>
       )}
 
       {/* MODEL TAB */}
-      {activeTab === "model" && (
+      {tab === "model" && (
         <>
-          {ranked.map((opp, i) => (
-            <div key={i}>
-              {opp.name} - {opp.total}
-            </div>
-          ))}
+          {/* Table */}
+          <div style={{ background: "white", padding: 20, borderRadius: 10 }}>
+            {opps.map((opp, i) => (
+              <div key={i} style={{ marginBottom: 10 }}>
+                <strong>{opp.name}</strong>
+
+                <div style={{ display: "flex", gap: 10 }}>
+                  {criteria.map((c) => (
+                    <div
+                      key={c}
+                      style={{
+                        background: getColor(opp[c]),
+                        color: "white",
+                        padding: 6,
+                        borderRadius: 6,
+                      }}
+                    >
+                      {c}: {opp[c]}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Ranking */}
+          <div style={{ marginTop: 20 }}>
+            <h2>Ranked Opportunities</h2>
+
+            {ranked.map((opp, i) => (
+              <div key={i}>
+                {opp.name} - {opp.total}
+              </div>
+            ))}
+          </div>
 
           <button onClick={generateInsights}>
             Generate AI Insights
           </button>
 
-          {loading && <p>Loading...</p>}
           {insights && <pre>{insights}</pre>}
         </>
       )}
     </div>
   );
 }
+``

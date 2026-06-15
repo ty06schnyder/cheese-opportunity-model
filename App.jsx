@@ -57,6 +57,7 @@ export default function App() {
 
   // ✅ IMPORT CSV
   const handleFileUpload = (e) => {
+    console.log("FILE UPLOAD TRIGGERED");
   const file = e.target.files[0];
   if (!file) return;
 

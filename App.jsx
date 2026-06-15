@@ -74,7 +74,7 @@ export default function App() {
 
     if (rows.length < 2) {
       alert("Invalid CSV format");
-      return;
+      return; 
     }
 
     const parsed = rows[0].map((header, i) => ({

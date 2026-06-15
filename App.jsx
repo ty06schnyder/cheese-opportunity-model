@@ -24,7 +24,7 @@ export default function App() {
   const [insights, setInsights] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Add metric row
+  // ✅ Add metric row, test
   const addMetric = () => {
     setMetrics([...metrics, { name: "", value: "" }]);
   };

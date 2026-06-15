@@ -24,9 +24,9 @@ export default function App() {
     if (!newName) return;
 
     setCriteria([...criteria, newName]);
-    setWeights({ ...weights, 20 });
+    setWeights({ ...weights, [newName]: 20 });
 
-    setOpps(opps.map((o) => ({ ...o, 3 })));
+    setOpps(opps.map((o) => ({ ...o, [newName]: 3 })));
   };
 
   const removeCriteria = (name) => {

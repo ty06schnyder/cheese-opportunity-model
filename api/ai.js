@@ -64,7 +64,7 @@ ${body.criteria.join(", ")}
 Weights:
 ${JSON.stringify(body.weights)}
 
-Output EXACTLY this format:
+Output EXACTLY this format, spacing and all:
 
 Top Opportunity:
 [Name]

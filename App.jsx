@@ -365,7 +365,7 @@ const chartOptions = {
 
           <div style={{ marginTop: 10 }}>
             <button onClick={convertToOpportunity}>
-              Convert to Opportunity
+              Add to Model
             </button>
           </div>
 

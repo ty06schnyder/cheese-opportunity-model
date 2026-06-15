@@ -89,6 +89,10 @@ Key Risk:
 Rules:
 - No markdown (** or ###)
 - Keep concise and actionable
+- Each section must be on its own line
+- Add a blank line between sections
+- Use bullet points only for "What to Do"
+- DO NOT write everything in one paragraph
 `;
     }
 

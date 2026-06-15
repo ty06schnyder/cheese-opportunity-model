@@ -14,7 +14,7 @@ export default async function handler(req, res) {
       prompt = `
 You are a data processing engine for the U.S. cheese category.
 
-Convert the following business metrics into scores from 1 to 5.
+Convert the following business metrics into scores from 1 to 5. Compare all products relative to all the other products on the list as well as just general real world metrics.
 
 Metrics:
 ${JSON.stringify(body.metrics)}
@@ -23,11 +23,12 @@ Criteria:
 ${body.criteria.join(", ")}
 
 Guidelines:
-- ~$10M in sales = strong
+- ~$15M in sales = strong
 - High distribution = high impact AND high competition
 - Lower price = easier execution
 - High velocity = higher growth
 - Use realistic cheese category assumptions
+- Use general business rules/best judgement to fill in blanks and match up metrics
 
 Rules:
 - Return ONLY raw JSON

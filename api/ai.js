@@ -10,33 +10,24 @@ export default async function handler(req, res) {
 
     // ✅ MAPPING MODE (metrics → scores)
     if (body.type === "mapping") {
-      prompt = `
-You are a category strategy expert focused on the U.S. cheese market.
+      ```js
+prompt = `
+You are a data processing engine.
 
-Convert the following business metrics into 1–5 scores.
+Convert these business metrics into scores from 1 to 5.
 
 Metrics:
-${JSON.stringify(body.metrics, null, 2)}
+${JSON.stringify(body.metrics)}
 
 Criteria:
 ${body.criteria.join(", ")}
 
-Guidelines:
-- ~$10M in sales = strong
-- High distribution = high impact + high competition
-- Lower price = easier execution
-- High velocity = higher growth
+Rules:
+- Return ONLY raw JSON
+- Do NOT include text before or after
+- Do NOT use markdown formatting
+- Do NOT explain anything
 
-Return ONLY valid JSON like this:
-{
-  "Growth": 1-5,
-  "Impact": 1-5,
-  "Ease": 1-5,
-  "Competition": 1-5,
-  "Trend": 1-5
-}
-`;
-    }
 
     // ✅ INSIGHTS MODE
     else if (body.type === "insights") {

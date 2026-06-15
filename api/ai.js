@@ -64,7 +64,7 @@ ${body.criteria.join(", ")}
 Weights:
 ${JSON.stringify(body.weights)}
 
-Output EXACTLY this format, spacing and all:
+Output EXACTLY this format, spacing and all. I want this to be able to be copy and pasted into a professional powerpoint:
 
 Top Opportunity:
 [Name]

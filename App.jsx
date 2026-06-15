@@ -138,7 +138,7 @@ export default function App() {
           <h2>Enter Metrics</h2>
 
           <input
-            placeholder="Opportunity Name"
+            placeholder="Product Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             style={{ display: "block", marginBottom: 10 }}

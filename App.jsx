@@ -2,15 +2,10 @@ import React, { useState } from "react";
 
 const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
 
-const defaultOpp = (criteria) => {
-  const base = { name: "" };
-  criteria.forEach((c) => (base[c] = 3));
-  return base;
-}; 
-
 export default function App() {
   const [tab, setTab] = useState("input");
   const [criteria, setCriteria] = useState(defaultCriteria);
+
   const [weights, setWeights] = useState(
     Object.fromEntries(defaultCriteria.map((c) => [c, 20]))
   );
@@ -23,15 +18,15 @@ export default function App() {
   const [insights, setInsights] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Add/remove criteria
+  // ✅ ADD / REMOVE CRITERIA
   const addCriteria = () => {
-    const newName = prompt("Enter new criteria name");
+    const newName = prompt("Enter new criteria");
     if (!newName) return;
 
     setCriteria([...criteria, newName]);
-    setWeights({ ...weights, [newName]: 20 });
+    setWeights({ ...weights, 20 });
 
-    setOpps(opps.map((o) => ({ ...o, [newName]: 3 })));
+    setOpps(opps.map((o) => ({ ...o, 3 })));
   };
 
   const removeCriteria = (name) => {
@@ -50,7 +45,7 @@ export default function App() {
     );
   };
 
-  // ✅ Metrics input
+  // ✅ METRICS INPUT
   const addMetric = () =>
     setMetrics([...metrics, { name: "", value: "" }]);
 
@@ -60,7 +55,32 @@ export default function App() {
     setMetrics(updated);
   };
 
-  // ✅ Convert metrics → scores via AI
+  // ✅ IMPORT CSV
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const rows = text.split("\n").map((r) => r.split(","));
+
+      const headers = rows[0];
+      const values = rows[1];
+
+      const parsed = headers.map((h, i) => ({
+        name: h.trim(),
+        value: values[i]?.trim(),
+      }));
+
+      setMetrics(parsed);
+    };
+
+    reader.readAsText(file);
+  };
+
+  // ✅ CONVERT METRICS → AI SCORES
   const convertToOpportunity = async () => {
     if (!name) return;
 
@@ -69,7 +89,9 @@ export default function App() {
 
       const res = await fetch("/api/ai", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           type: "mapping",
           metrics,
@@ -92,6 +114,7 @@ export default function App() {
 
       setOpps([...opps, newOpp]);
       setTab("model");
+
       setMetrics([{ name: "", value: "" }]);
       setName("");
 
@@ -103,7 +126,7 @@ export default function App() {
     }
   };
 
-  // ✅ Scoring
+  // ✅ SCORING
   const totalWeight =
     Object.values(weights).reduce((a, b) => a + b, 0) || 1;
 
@@ -117,14 +140,39 @@ export default function App() {
 
   const ranked = [...scored].sort((a, b) => b.total - a.total);
 
-  // ✅ AI Insights
+  // ✅ EXPORT CSV
+  const exportToCSV = () => {
+    const headers = ["Product", ...criteria, "Total"];
+
+    const rows = ranked.map((opp) => [
+      opp.name,
+      ...criteria.map((c) => opp[c]),
+      opp.total,
+    ]);
+
+    const csvContent = [headers, ...rows]
+      .map((r) => r.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "opportunities.csv";
+    link.click();
+  };
+
+  // ✅ INSIGHTS
   const generateInsights = async () => {
     try {
       setLoading(true);
 
       const res = await fetch("/api/ai", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           type: "insights",
           criteria,
@@ -159,16 +207,16 @@ export default function App() {
     <div style={{ padding: 40, background: "#f6f8fb" }}>
       <h1>Opportunity Prioritization Model</h1>
 
-      {/* Tabs */}
+      {/* TABS */}
       <div style={{ marginBottom: 20 }}>
         <button onClick={() => setTab("input")}>Data Input</button>
         <button onClick={() => setTab("model")}>Model</button>
       </div>
 
-      {/* ================= INPUT TAB ================= */}
+      {/* ✅ INPUT TAB */}
       {tab === "input" && (
         <div style={{ background: "white", padding: 20 }}>
-          <h2>Enter Products</h2>
+          <h2>Enter Metrics</h2>
 
           <input
             placeholder="Product Name"
@@ -199,71 +247,59 @@ export default function App() {
             </button>
           </div>
 
+          <div style={{ marginTop: 15 }}>
+            <input type="file" accept=".csv" onChange={handleFileUpload} />
+          </div>
+
           {loading && <p>AI processing metrics...</p>}
         </div>
       )}
 
-      {/* ================= MODEL TAB ================= */}
+      {/* ✅ MODEL TAB */}
       {tab === "model" && (
         <>
-          {/* Criteria controls */}
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-  {criteria.map((c) => (
-    <div
-      key={c}
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
-        background: "#f3f4f6",
-        padding: "5px 10px",
-        borderRadius: 10,
-        fontSize: "12px",
-      }}
-    >
-      <span>{c}</span>
+          {/* Criteria pills */}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {criteria.map((c) => (
+              <div
+                key={c}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  background: "#f3f4f6",
+                  padding: "5px 10px",
+                  borderRadius: 10,
+                  fontSize: "12px",
+                }}
+              >
+                {c}
+                <button
+                  onClick={() => removeCriteria(c)}
+                  style={{
+                    fontSize: 10,
+                    width: 16,
+                    height: 16,
+                    borderRadius: "50%",
+                    border: "none",
+                    background: "#e5e7eb",
+                    cursor: "pointer",
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
 
-      <button
-        onClick={() => removeCriteria(c)}
-        style={{
-          fontSize: "10px",
-          width: 16,
-          height: 16,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderRadius: "50%",
-          border: "none",
-          background: "#e5e7eb",
-          cursor: "pointer",
-          padding: 0,
-        }}
-      >
-        ✕
-      </button>
-    </div>
-  ))}
+            <button onClick={addCriteria}>+ Add</button>
+          </div>
 
-  <button
-    onClick={addCriteria}
-    style={{
-      padding: "5px 10px",
-      borderRadius: 10,
-      border: "1px dashed #d1d5db",
-      background: "white",
-      cursor: "pointer",
-      fontSize: "12px",
-    }}
-  >
-    + Add
-  </button>
-</div>
-
-          {/* Opportunities */}
-          <div style={{ background: "white", padding: 20 }}>
+          {/* Opps */}
+          <div style={{ marginTop: 20, background: "white", padding: 20 }}>
             {opps.map((opp, i) => (
               <div key={i}>
                 <strong>{opp.name}</strong>
+
                 <div style={{ display: "flex", gap: 10 }}>
                   {criteria.map((c) => (
                     <div
@@ -286,7 +322,6 @@ export default function App() {
           {/* Ranking */}
           <div style={{ marginTop: 20 }}>
             <h2>Ranked</h2>
-
             {ranked.map((opp, i) => (
               <div key={i}>
                 {opp.name} - {opp.total}
@@ -294,14 +329,19 @@ export default function App() {
             ))}
           </div>
 
-          {/* AI */}
-          <button onClick={generateInsights}>
-            Generate AI Insights
-          </button>
+          {/* Buttons */}
+          <div style={{ marginTop: 15, display: "flex", gap: 10 }}>
+            <button onClick={generateInsights}>
+              Generate AI Insights
+            </button>
+            <button onClick={exportToCSV}>
+              Export to Excel
+            </button>
+          </div>
 
+          {/* AI Output */}
           <div style={{ marginTop: 20 }}>
             {loading && <p>Generating insights...</p>}
-
             {insights && (
               <div style={{ background: "white", padding: 16 }}>
                 {insights}

@@ -1,6 +1,5 @@
 export default async function handler(req, res) {
   try {
-    // ✅ Safe body parsing
     const body =
       typeof req.body === "string"
         ? JSON.parse(req.body)
@@ -8,13 +7,14 @@ export default async function handler(req, res) {
 
     let prompt = "";
 
-    // ✅ MAPPING MODE (metrics → scores)
+    // ✅ =========================
+    // ✅ MODE 1: METRICS → SCORES
+    // ✅ =========================
     if (body.type === "mapping") {
-      ```js
-prompt = `
-You are a data processing engine.
+      prompt = `
+You are a data processing engine for the U.S. cheese category.
 
-Convert these business metrics into scores from 1 to 5.
+Convert the following business metrics into scores from 1 to 5.
 
 Metrics:
 ${JSON.stringify(body.metrics)}
@@ -22,21 +22,33 @@ ${JSON.stringify(body.metrics)}
 Criteria:
 ${body.criteria.join(", ")}
 
+Guidelines:
+- ~$10M in sales = strong
+- High distribution = high impact AND high competition
+- Lower price = easier execution
+- High velocity = higher growth
+- Use realistic cheese category assumptions
+
 Rules:
 - Return ONLY raw JSON
-- Do NOT include text before or after
-- Do NOT use markdown formatting
 - Do NOT explain anything
+- Do NOT use markdown
 
+Output EXACTLY like:
+{"Growth":3,"Impact":4,"Ease":2,"Competition":3,"Trend":3}
+`;
+    }
 
-    // ✅ INSIGHTS MODE
+    // ✅ =========================
+    // ✅ MODE 2: INSIGHTS
+    // ✅ =========================
     else if (body.type === "insights") {
       prompt = `
 You are a strategy consultant.
 
 Analyze these opportunities:
 
-${JSON.stringify(body.opportunities, null, 2)}
+${JSON.stringify(body.opportunities)}
 
 Criteria:
 ${body.criteria.join(", ")}
@@ -67,16 +79,22 @@ Key Risk:
 [1-2 sentences]
 
 Rules:
-- No markdown symbols
-- Keep concise
+- No markdown (** or ###)
+- Keep concise and actionable
 `;
-    } else {
+    }
+
+    // ✅ Safety: missing type
+    else {
       return res.status(400).json({
-        text: "Missing or invalid request type",
+        text: "Invalid request type",
       });
     }
 
-    // ✅ Call OpenAI
+    // ✅ Add timeout protection (prevents hanging forever)
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
     const response = await fetch(
       "https://api.openai.com/v1/chat/completions",
       {
@@ -90,14 +108,18 @@ Rules:
           messages: [{ role: "user", content: prompt }],
           temperature: 0.3,
         }),
+        signal: controller.signal,
       }
     );
 
+    clearTimeout(timeout);
+
     const data = await response.json();
 
-    // ✅ Fail safely if API errors
+    console.log("AI RESPONSE:", JSON.stringify(data));
+
+    // ✅ Handle API errors safely
     if (!data || !data.choices) {
-      console.error("OpenAI error:", data);
       return res.status(500).json({
         text: "AI ERROR: " + JSON.stringify(data),
       });

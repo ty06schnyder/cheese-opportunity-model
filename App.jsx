@@ -140,7 +140,10 @@ export default function App() {
           newOpp[c] = scores[c] || 3;
         });
 
-        newOpps.push(newOpp);
+        // ✅ prevent duplicates (within this upload)
+if (!newOpps.some((o) => o.name === newOpp.name)) {
+  newOpps.push(newOpp);
+}
 
       } catch (err) {
         console.log("Skipping row due to error:", err);

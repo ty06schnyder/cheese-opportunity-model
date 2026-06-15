@@ -1,70 +1,65 @@
 export default async function handler(req, res) {
   try {
+    // ✅ Safe body parsing
     const body =
-      typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+      typeof req.body === "string"
+        ? JSON.parse(req.body)
+        : req.body || {};
 
     let prompt = "";
 
-    // ✅ MODE 1 — METRICS → SCORES
+    // ✅ MAPPING MODE (metrics → scores)
     if (body.type === "mapping") {
       prompt = `
 You are a category strategy expert focused on the U.S. cheese market.
 
-Your task is to convert raw business metrics into 1–5 scores.
+Convert the following business metrics into 1–5 scores.
 
 Metrics:
 ${JSON.stringify(body.metrics, null, 2)}
 
-Scoring Criteria:
+Criteria:
 ${body.criteria.join(", ")}
 
 Guidelines:
-- Use realistic cheese category context
-- Example benchmarks:
-  - ~$10M in sales = strong
-  - High distribution = higher impact AND higher competition
-  - Lower price = easier execution
-  - High velocity = strong growth signal
+- ~$10M in sales = strong
+- High distribution = high impact + high competition
+- Lower price = easier execution
+- High velocity = higher growth
 
-Instructions:
-- Assign each criterion a score from 1–5
-- Be logical and consistent
-- Do not explain anything
-
-Return ONLY valid JSON in this exact format:
-
+Return ONLY valid JSON like this:
 {
-  "Growth": number,
-  "Impact": number,
-  "Ease": number,
-  "Competition": number,
-  "Trend": number
+  "Growth": 1-5,
+  "Impact": 1-5,
+  "Ease": 1-5,
+  "Competition": 1-5,
+  "Trend": 1-5
 }
 `;
     }
 
-    // ✅ MODE 2 — SCORED OPPORTUNITIES → INSIGHTS
-    if (body.type === "insights") {
+    // ✅ INSIGHTS MODE
+    else if (body.type === "insights") {
       prompt = `
-You are a strategy consultant preparing a recommendation for business leadership.
+You are a strategy consultant.
 
-Analyze the following opportunities:
+Analyze these opportunities:
 
 ${JSON.stringify(body.opportunities, null, 2)}
 
-Scoring Criteria:
+Criteria:
 ${body.criteria.join(", ")}
 
 Weights:
 ${JSON.stringify(body.weights)}
 
-Your output must follow this EXACT format:
+Output EXACTLY this format:
 
 Top Opportunity:
 [Name]
 
 Where to Focus:
-[1–2 sentences]
+[1-2 sentences]
 
 What to Do:
 - Action 1
@@ -72,19 +67,22 @@ What to Do:
 - Action 3
 
 Why It Matters:
-[2–3 sentences explaining business impact]
+[2-3 sentences]
 
 Second Priority:
 [Name]
 
 Key Risk:
-[1–2 sentences]
+[1-2 sentences]
 
 Rules:
-- Do NOT use markdown formatting (**, #, etc.)
-- Keep it concise and executive-ready
-- Focus on actions, not descriptions
+- No markdown symbols
+- Keep concise
 `;
+    } else {
+      return res.status(400).json({
+        text: "Missing or invalid request type",
+      });
     }
 
     // ✅ Call OpenAI
@@ -106,10 +104,9 @@ Rules:
 
     const data = await response.json();
 
-    console.log("OPENAI RESPONSE:", JSON.stringify(data, null, 2));
-
-    // ✅ Error handling
+    // ✅ Fail safely if API errors
     if (!data || !data.choices) {
+      console.error("OpenAI error:", data);
       return res.status(500).json({
         text: "AI ERROR: " + JSON.stringify(data),
       });

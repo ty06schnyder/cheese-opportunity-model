@@ -64,7 +64,7 @@ ${body.criteria.join(", ")}
 Weights:
 ${JSON.stringify(body.weights)}
 
-IMPORTANT: Format your response EXACTLY like this, with line breaks:
+IMPORTANT: Format your response EXACTLY like this, make sure to follow the rules to a tee:
 
 Top Opportunity:
 [Name]

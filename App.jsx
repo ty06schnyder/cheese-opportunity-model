@@ -172,52 +172,92 @@ export default function App() {
       )}
 
       {/* MODEL TAB */}
-      {tab === "model" && (
-        <>
-          {/* Table */}
-          <div style={{ background: "white", padding: 20, borderRadius: 10 }}>
-            {opps.map((opp, i) => (
-              <div key={i} style={{ marginBottom: 10 }}>
-                <strong>{opp.name}</strong>
+{tab === "model" && (
+  <>
+    {/* Table (restored full view) */}
+    <div style={{ background: "white", padding: 20, borderRadius: 10 }}>
+      {opps.map((opp, i) => (
+        <div key={i} style={{ marginBottom: 15 }}>
+          <strong>{opp.name}</strong>
 
-                <div style={{ display: "flex", gap: 10 }}>
-                  {criteria.map((c) => (
-                    <div
-                      key={c}
-                      style={{
-                        background: getColor(opp[c]),
-                        color: "white",
-                        padding: 6,
-                        borderRadius: 6,
-                      }}
-                    >
-                      {c}: {opp[c]}
-                    </div>
-                  ))}
-                </div>
+          <div style={{ display: "flex", gap: 10, marginTop: 6 }}>
+            {criteria.map((c) => (
+              <div
+                key={c}
+                style={{
+                  background: getColor(opp[c]),
+                  color: "white",
+                  padding: "6px 10px",
+                  borderRadius: 6,
+                  fontSize: "13px",
+                }}
+              >
+                {c}: {opp[c]}
               </div>
             ))}
           </div>
+        </div>
+      ))}
+    </div>
 
-          {/* Ranking */}
-          <div style={{ marginTop: 20 }}>
-            <h2>Ranked Opportunities</h2>
+    {/* Ranking */}
+    <div style={{ marginTop: 25 }}>
+      <h2>Ranked Opportunities</h2>
 
-            {ranked.map((opp, i) => (
-              <div key={i}>
-                {opp.name} - {opp.total}
-              </div>
-            ))}
-          </div>
+      {ranked.map((opp, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            padding: 12,
+            background: "white",
+            marginBottom: 8,
+            borderRadius: 8,
+            borderLeft: `6px solid ${getColor(Math.round(opp.total))}`,
+          }}
+        >
+          <span>{opp.name}</span>
+          <strong>{opp.total}</strong>
+        </div>
+      ))}
+    </div>
 
-          <button onClick={generateInsights}>
-            Generate AI Insights
-          </button>
+    {/* AI INSIGHTS BUTTON */}
+    <div style={{ marginTop: 20 }}>
+      <button
+        onClick={generateInsights}
+        style={{
+          background: "#2563eb",
+          color: "white",
+          padding: "10px 16px",
+          borderRadius: 8,
+          border: "none",
+          cursor: "pointer",
+        }}
+      >
+        Generate AI Insights
+      </button>
+    </div>
 
-          {insights && <pre>{insights}</pre>}
-        </>
+    {/* AI OUTPUT */}
+    <div style={{ marginTop: 20 }}>
+      {loading && <p>Generating insights...</p>}
+
+      {insights && (
+        <div
+          style={{
+            background: "white",
+            padding: 16,
+            borderRadius: 10,
+            lineHeight: 1.6,
+            border: "1px solid #e5e7eb",
+          }}
+        >
+          {insights}
+        </div>
       )}
     </div>
-  );
-}
+  </>
+)}
 ``

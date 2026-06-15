@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; 
 
 const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
 

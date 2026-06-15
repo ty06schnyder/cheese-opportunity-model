@@ -1,5 +1,6 @@
 export default async function handler(req, res) {
   try {
+    // ✅ Safe body parsing
     const body =
       typeof req.body === "string"
         ? JSON.parse(req.body)
@@ -7,18 +8,84 @@ export default async function handler(req, res) {
 
     let prompt = "";
 
+    // ✅ MAPPING MODE (metrics → scores)
     if (body.type === "mapping") {
-      prompt =
-        "Convert these metrics into 1-5 scores for Growth, Impact, Ease, Competition, Trend. Return ONLY JSON: " +
-        JSON.stringify(body.metrics);
-    } else if (body.type === "insights") {
-      prompt =
-        "Analyze these opportunities and give top recommendation, actions, and risk: " +
-        JSON.stringify(body.opportunities);
-    } else {
-      return res.status(400).json({ text: "Invalid type" });
+      prompt = `
+You are a category strategy expert focused on the U.S. cheese market.
+
+Convert the following business metrics into 1–5 scores.
+
+Metrics:
+${JSON.stringify(body.metrics, null, 2)}
+
+Criteria:
+${body.criteria.join(", ")}
+
+Guidelines:
+- ~$10M in sales = strong
+- High distribution = high impact + high competition
+- Lower price = easier execution
+- High velocity = higher growth
+
+Return ONLY valid JSON like this:
+{
+  "Growth": 1-5,
+  "Impact": 1-5,
+  "Ease": 1-5,
+  "Competition": 1-5,
+  "Trend": 1-5
+}
+`;
     }
 
+    // ✅ INSIGHTS MODE
+    else if (body.type === "insights") {
+      prompt = `
+You are a strategy consultant.
+
+Analyze these opportunities:
+
+${JSON.stringify(body.opportunities, null, 2)}
+
+Criteria:
+${body.criteria.join(", ")}
+
+Weights:
+${JSON.stringify(body.weights)}
+
+Output EXACTLY this format:
+
+Top Opportunity:
+[Name]
+
+Where to Focus:
+[1-2 sentences]
+
+What to Do:
+- Action 1
+- Action 2
+- Action 3
+
+Why It Matters:
+[2-3 sentences]
+
+Second Priority:
+[Name]
+
+Key Risk:
+[1-2 sentences]
+
+Rules:
+- No markdown symbols
+- Keep concise
+`;
+    } else {
+      return res.status(400).json({
+        text: "Missing or invalid request type",
+      });
+    }
+
+    // ✅ Call OpenAI
     const response = await fetch(
       "https://api.openai.com/v1/chat/completions",
       {
@@ -30,20 +97,30 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model: "gpt-4o",
           messages: [{ role: "user", content: prompt }],
+          temperature: 0.3,
         }),
       }
     );
 
     const data = await response.json();
 
-    if (!data.choices) {
+    // ✅ Fail safely if API errors
+    if (!data || !data.choices) {
+      console.error("OpenAI error:", data);
       return res.status(500).json({
         text: "AI ERROR: " + JSON.stringify(data),
       });
     }
 
-    res.status(200).json({ text: data.choices[0].message.content });
-  } catch (e) {
-    res.status(500).json({ text: "Server error: " + e.message });
+    return res.status(200).json({
+      text: data.choices[0].message.content,
+    });
+
+  } catch (error) {
+    console.error("SERVER ERROR:", error);
+
+    return res.status(500).json({
+      text: "SERVER ERROR: " + error.message,
+    });
   }
 }

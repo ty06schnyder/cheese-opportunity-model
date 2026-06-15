@@ -462,8 +462,10 @@ const chartOptions = {
   value={editValue}
   onChange={(e) => setEditValue(e.target.value)}
   onBlur={() => {
-    updateScore(i, c, editValue); // ✅ save on exit
-    setEditing(null);
+    setTimeout(() => {
+      updateScore(i, c, editValue);
+      setEditing(null);
+    }, 100);
   }}
   onKeyDown={(e) => {
     if (e.key === "Enter") {

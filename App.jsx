@@ -58,7 +58,14 @@ export default function App() {
     setLoading(false);
 
     try {
-      const scores = JSON.parse(data.text);
+      let cleaned = data.text.trim();
+
+// remove ```json or ``` if present
+cleaned = cleaned.replace(/```json/g, "").replace(/```/g, "");
+
+// try parsing
+const scores = JSON.parse(cleaned);
+
 
       const newOpp = { name };
 

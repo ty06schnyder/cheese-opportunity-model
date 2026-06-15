@@ -1,32 +1,70 @@
 export default async function handler(req, res) {
   try {
-    // ✅ Parse request safely (Vercel sometimes needs this)
     const body =
       typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
-    const { opportunities, criteria, weights } = body;
+    let prompt = "";
 
-    // ✅ Build prompt
-    const prompt = `
+    // ✅ MODE 1 — METRICS → SCORES
+    if (body.type === "mapping") {
+      prompt = `
+You are a category strategy expert focused on the U.S. cheese market.
+
+Your task is to convert raw business metrics into 1–5 scores.
+
+Metrics:
+${JSON.stringify(body.metrics, null, 2)}
+
+Scoring Criteria:
+${body.criteria.join(", ")}
+
+Guidelines:
+- Use realistic cheese category context
+- Example benchmarks:
+  - ~$10M in sales = strong
+  - High distribution = higher impact AND higher competition
+  - Lower price = easier execution
+  - High velocity = strong growth signal
+
+Instructions:
+- Assign each criterion a score from 1–5
+- Be logical and consistent
+- Do not explain anything
+
+Return ONLY valid JSON in this exact format:
+
+{
+  "Growth": number,
+  "Impact": number,
+  "Ease": number,
+  "Competition": number,
+  "Trend": number
+}
+`;
+    }
+
+    // ✅ MODE 2 — SCORED OPPORTUNITIES → INSIGHTS
+    if (body.type === "insights") {
+      prompt = `
 You are a strategy consultant preparing a recommendation for business leadership.
 
 Analyze the following opportunities:
 
-${JSON.stringify(opportunities, null, 2)}
+${JSON.stringify(body.opportunities, null, 2)}
 
-Scoring criteria:
-${criteria.join(", ")}
+Scoring Criteria:
+${body.criteria.join(", ")}
 
 Weights:
-${JSON.stringify(weights)}
+${JSON.stringify(body.weights)}
 
 Your output must follow this EXACT format:
 
 Top Opportunity:
-[Name of top opportunity]
+[Name]
 
 Where to Focus:
-[1–2 sentences on where to prioritize effort]
+[1–2 sentences]
 
 What to Do:
 - Action 1
@@ -34,22 +72,22 @@ What to Do:
 - Action 3
 
 Why It Matters:
-[2–3 sentences explaining the business impact and reasoning]
+[2–3 sentences explaining business impact]
 
 Second Priority:
-[Name of second best opportunity]
+[Name]
 
 Key Risk:
 [1–2 sentences]
 
 Rules:
-- Do NOT use any markdown symbols (**, #, etc.)
-- Do NOT include headings formatting
-- Keep it concise, clear, and executive-ready
-- Focus on actionable insights, not descriptions
+- Do NOT use markdown formatting (**, #, etc.)
+- Keep it concise and executive-ready
+- Focus on actions, not descriptions
 `;
+    }
 
-    // ✅ Call OpenAI (stable + working model)
+    // ✅ Call OpenAI
     const response = await fetch(
       "https://api.openai.com/v1/chat/completions",
       {
@@ -59,35 +97,33 @@ Rules:
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o", // 🔥 IMPORTANT FIX (do not change)
+          model: "gpt-4o",
           messages: [{ role: "user", content: prompt }],
-          temperature: 0.7,
+          temperature: 0.3,
         }),
       }
     );
 
     const data = await response.json();
 
-    // ✅ Debug logging (shows in Vercel logs)
     console.log("OPENAI RESPONSE:", JSON.stringify(data, null, 2));
 
-    // ✅ Handle errors gracefully
+    // ✅ Error handling
     if (!data || !data.choices) {
       return res.status(500).json({
         text: "AI ERROR: " + JSON.stringify(data),
       });
     }
 
-    // ✅ Return clean response
     return res.status(200).json({
       text: data.choices[0].message.content,
     });
+
   } catch (error) {
-    console.error("FULL ERROR:", error);
+    console.error("SERVER ERROR:", error);
 
     return res.status(500).json({
       text: "SERVER ERROR: " + error.message,
     });
   }
 }
-``

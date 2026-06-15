@@ -1,5 +1,17 @@
 import React, { useState } from "react"; 
 
+import { Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+
 const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
 
 export default function App() {
@@ -220,6 +232,36 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
 
   const ranked = [...scored].sort((a, b) => b.total - a.total);
 
+  const chartData = {
+  labels: ranked.map((o) =>
+  o.name.length > 25 ? o.name.substring(0, 25) + "..." : o.name
+),
+  datasets: [
+    {
+      label: "Opportunity Score",
+      data: ranked.map((o) => o.total),
+      backgroundColor: "#2563eb",
+      borderRadius: 6,
+    },
+  ],
+};
+
+const chartOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      display: false,
+    },
+  },
+  scales: {
+    x: {
+      ticks: {
+        maxRotation: 45,
+        minRotation: 45,
+      },
+    },
+  },
+};
   // ✅ EXPORT CSV
   const exportToCSV = () => {
     const headers = ["Product", ...criteria, "Total"];
@@ -407,6 +449,13 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
                 {opp.name} - {opp.total}
               </div>
             ))}
+            <div style={{ marginTop: 30 }}>
+  <h2>Opportunity Comparison</h2>
+
+  <div style={{ background: "white", padding: 20, borderRadius: 10 }}>
+    <Bar data={chartData} options={chartOptions} />
+  </div>
+</div>
           </div>
 
           {/* Buttons */}

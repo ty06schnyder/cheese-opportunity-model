@@ -24,7 +24,7 @@ export default function App() {
 
   const [opps, setOpps] = useState([]);
   const [editing, setEditing] = useState(null);
-
+  const [editValue, setEditValue] = useState("");
   const [metrics, setMetrics] = useState([{ name: "", value: "" }]);
   const [name, setName] = useState("");
 
@@ -439,7 +439,10 @@ const chartOptions = {
                 <div style={{ display: "flex", gap: 10 }}>
                   {criteria.map((c) => (
                     <div
-  onClick={() => setEditing(`${i}-${c}`)}
+  onClick={() => {
+  setEditing(`${i}-${c}`);
+  setEditValue(opp[c]); // ✅ preload current value
+}}
   style={{
     background: getColor(opp[c]),
     color: "white",
@@ -452,25 +455,32 @@ const chartOptions = {
 >
   {editing === `${i}-${c}` ? (
     <input
-      type="number"
-      min="1"
-      max="5"
-      autoFocus
-      value={opp[c]}
-      onChange={(e) =>
-        updateScore(i, c, e.target.value)
-      }
-      onBlur={() => setEditing(null)}
-      style={{
-        width: "100%",
-        border: "none",
-        background: "transparent",
-        color: "white",
-        textAlign: "center",
-        fontWeight: "bold",
-        outline: "none",
-      }}
-    />
+  type="number"
+  min="1"
+  max="5"
+  autoFocus
+  value={editValue}
+  onChange={(e) => setEditValue(e.target.value)}
+  onBlur={() => {
+    updateScore(i, c, editValue); // ✅ save on exit
+    setEditing(null);
+  }}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      updateScore(i, c, editValue);
+      setEditing(null);
+    }
+  }}
+  style={{
+    width: "100%",
+    border: "none",
+    background: "transparent",
+    color: "white",
+    textAlign: "center",
+    fontWeight: "bold",
+    outline: "none",
+  }}
+/>
   ) : (
     <span>
       {c}: {opp[c]}

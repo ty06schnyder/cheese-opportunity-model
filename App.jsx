@@ -32,7 +32,7 @@ export default function App() {
   const removeCriteria = (name) => {
     setCriteria(criteria.filter((c) => c !== name));
 
-    const newWeights = { ...weights };
+    const newWeights = { ...weights }; 
     delete newWeights[name];
     setWeights(newWeights);
 

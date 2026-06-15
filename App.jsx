@@ -65,27 +65,21 @@ export default function App() {
   reader.onload = (event) => {
     const text = event.target.result;
 
-    console.log("RAW CSV:", text); // 👈 debug
-
     const rows = text
       .split("\n")
-      .map((r) => r.split(","))
-      .filter((r) => r.length > 1 && r[0] !== "");
+      .map((r) =>
+        r.split(",").map((cell) => cell.replace(/"/g, "").trim())
+      )
+      .filter((r) => r.length > 1 && r[0]);
 
     if (rows.length < 2) {
       alert("Invalid CSV format");
       return;
     }
 
-    const headers = rows[0];
-    const values = rows[1];
-
-    console.log("HEADERS:", headers);
-    console.log("VALUES:", values);
-
-    const parsed = headers.map((h, i) => ({
-      name: h.trim(),
-      value: values[i]?.trim() || "",
+    const parsed = rows[0].map((header, i) => ({
+      name: header,
+      value: rows[1][i] || "",
     }));
 
     setMetrics(parsed);
@@ -93,7 +87,6 @@ export default function App() {
 
   reader.readAsText(file);
 };
-``
 
   // ✅ CONVERT METRICS → AI SCORES
   const convertToOpportunity = async () => {

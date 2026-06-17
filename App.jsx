@@ -447,9 +447,11 @@ const chartOptions = {
                   {criteria.map((c) => (
                     <div
   onClick={() => {
-  setEditing(`${opp.id}-${c}`)
-  setEditValue(opp[c]); // ✅ preload current value
-}}
+    if (editing === `${opp.id}-${c}`) return;
+
+    setEditing(`${opp.id}-${c}`);
+    setEditValue(opp[c]);
+  }}
   style={{
     background: getColor(opp[c]),
     color: "white",
@@ -469,10 +471,7 @@ const chartOptions = {
   value={editValue}
   onChange={(e) => setEditValue(e.target.value)}
   onBlur={() => {
-    setTimeout(() => {
-      updateScore(opp.id, c, editValue);
-      setEditing(null);
-    }, 100);
+    setEditing(null);
   }}
   onKeyDown={(e) => {
     if (e.key === "Enter") {

@@ -199,17 +199,17 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
 
       const scores = JSON.parse(cleaned);
 
-      const updateScore = (index, criteriaName, value) => {
-  let num = Number(value);
+  const updateScore = (index, criteriaName, value) => {
+    let num = Number(value);
 
-  if (num > 5) num = 5;
-  if (num < 1) num = 1;
+    if (num > 5) num = 5;
+    if (num < 1) num = 1;
 
-  const updated = [...opps];
-  updated[index][criteriaName] = num;
+    const updated = [...opps];
+    updated[index][criteriaName] = num;
 
-  setOpps(updated);
-};
+    setOpps(updated);
+  };
 
       
       const newOpp = { name };

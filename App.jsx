@@ -19,6 +19,8 @@ export default function App() {
   const [criteria, setCriteria] = useState(defaultCriteria);
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("total");
+  const [chartMetric, setChartMetric] = useState("total");
+  const [hiddenProducts, setHiddenProducts] = useState([]);
   const [weights, setWeights] = useState(
     Object.fromEntries(defaultCriteria.map((c) => [c, 20]))
   );
@@ -264,7 +266,14 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
     return b[sortBy] - a[sortBy];
   });
 
-  const chartSorted = [...ranked].sort((a, b) => b.total - a.total);
+  const visibleForChart = ranked.filter(
+    (opp) => !hiddenProducts.includes(opp.id)
+  );
+
+  const chartSorted = [...visibleForChart].sort((a, b) => {
+    if (chartMetric === "total") return b.total - a.total;
+    return b[chartMetric] - a[chartMetric];
+  });
 
   const chartData = {
     labels: chartSorted.map((o) =>
@@ -272,10 +281,14 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
     ),
     datasets: [
       {
-        label: "Opportunity Score",
-        data: chartSorted.map((o) => o.total),
+        label:
+          chartMetric === "total"
+            ? "Total Score"
+            : chartMetric,
+        data: chartSorted.map((o) =>
+          chartMetric === "total" ? o.total : o[chartMetric]
+        ),
         backgroundColor: "#2563eb",
-        borderRadius: 6,
       },
     ],
   };
@@ -574,7 +587,65 @@ const chartOptions = {
             ))}
             <div style={{ marginTop: 30 }}>
   <h2>Opportunity Comparison</h2>
+              
+  <div style={{ marginBottom: 15 }}>
+    {/* Y AXIS CONTROL */}
+    <label>Y-Axis: </label>
+    <select
+      value={chartMetric}
+      onChange={(e) => setChartMetric(e.target.value)}
+    >
+      <option value="total">Total</option>
+      {criteria.map((c) => (
+        <option key={c} value={c}>
+          {c}
+        </option>
+      ))}
+    </select>
 
+    {/* RESET BUTTON */}
+    <button
+      style={{ marginLeft: 10 }}
+      onClick={() => {
+        setChartMetric("total");
+        setHiddenProducts([]);
+      }}
+    >
+      Reset Chart
+    </button>
+  </div>
+  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+    {ranked.map((opp) => {
+      const isHidden = hiddenProducts.includes(opp.id);
+
+      return (
+        <div
+          key={opp.id}
+          onClick={() => {
+            if (isHidden) {
+              setHiddenProducts(
+                hiddenProducts.filter((id) => id !== opp.id)
+              );
+            } else {
+              setHiddenProducts([...hiddenProducts, opp.id]);
+            }
+          }}
+          style={{
+            padding: "5px 10px",
+            borderRadius: 10,
+            background: isHidden ? "#e5e7eb" : "#2563eb",
+            color: isHidden ? "black" : "white",
+            cursor: "pointer",
+            fontSize: 12,
+          }}
+        >
+          {opp.name.length > 20
+            ? opp.name.substring(0, 20) + "..."
+            : opp.name}
+        </div>
+      );
+    })}
+  </div>
   <div style={{ background: "white", padding: 20, borderRadius: 10 }}>
     <Bar data={chartData} options={chartOptions} />
   </div>

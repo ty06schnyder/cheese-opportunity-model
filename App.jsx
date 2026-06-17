@@ -13,7 +13,7 @@ import {
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
-
+// Test
 export default function App() {
   const [tab, setTab] = useState("input");
   const [criteria, setCriteria] = useState(defaultCriteria);

@@ -264,19 +264,21 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
     return b[sortBy] - a[sortBy];
   });
 
+  const chartSorted = [...ranked].sort((a, b) => b.total - a.total);
+
   const chartData = {
-  labels: ranked.map((o) =>
-  o.name.length > 25 ? o.name.substring(0, 25) + "..." : o.name
-),
-  datasets: [
-    {
-      label: "Opportunity Score",
-      data: ranked.map((o) => o.total),
-      backgroundColor: "#2563eb",
-      borderRadius: 6,
-    },
-  ],
-};
+    labels: chartSorted.map((o) =>
+      o.name.length > 25 ? o.name.substring(0, 25) + "..." : o.name
+    ),
+    datasets: [
+      {
+        label: "Opportunity Score",
+        data: chartSorted.map((o) => o.total),
+        backgroundColor: "#2563eb",
+        borderRadius: 6,
+      },
+    ],
+  };
 
 const chartOptions = {
   responsive: true,
@@ -500,7 +502,7 @@ const chartOptions = {
           
           {/* Opps */}
           <div style={{ marginTop: 20, background: "white", padding: 20 }}>
-            {opps.map((opp) => (
+            {ranked.map((opp) => (
               <div key={opp.id}>
                 <strong>{opp.name}</strong>
 

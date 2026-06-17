@@ -17,7 +17,8 @@ const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
 export default function App() {
   const [tab, setTab] = useState("input");
   const [criteria, setCriteria] = useState(defaultCriteria);
-
+  const [filters, setFilters] = useState({});
+  const [sortBy, setSortBy] = useState("total");
   const [weights, setWeights] = useState(
     Object.fromEntries(defaultCriteria.map((c) => [c, 20]))
   );
@@ -251,7 +252,17 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
     return { ...opp, total: Number((total * criteria.length).toFixed(2)) };
   });
 
-  const ranked = [...scored].sort((a, b) => b.total - a.total);
+  const filtered = scored.filter((opp) => {
+    return Object.entries(filters).every(([key, value]) => {
+      if (!value) return true;
+      return opp[key] >= value;
+    });
+  });
+
+  const ranked = [...filtered].sort((a, b) => {
+    if (sortBy === "total") return b.total - a.total;
+    return b[sortBy] - a[sortBy];
+  });
 
   const chartData = {
   labels: ranked.map((o) =>
@@ -436,7 +447,57 @@ const chartOptions = {
 
             <button onClick={addCriteria}>+ Add</button>
           </div>
+          <div style={{ marginTop: 20, marginBottom: 20 }}>
+            <h3>Controls</h3>
 
+            {/* SORT */}
+            <div style={{ marginBottom: 10 }}>
+              <label>Sort by: </label>
+
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="total">Total Score</option>
+
+                {criteria.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* FILTERS */}
+            <div style={{ display: "flex", gap: 15, flexWrap: "wrap" }}>
+              {criteria.map((c) => (
+                <div key={c}>
+                  <div style={{ fontSize: 12 }}>{c} ≥</div>
+
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={filters[c] || ""}
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        [c]: Number(e.target.value),
+                      })
+                    }
+                    style={{ width: 50 }}
+                  />
+                </div>
+              ))}
+            </div>
+            
+            <div style={{ marginTop: 10 }}>
+              <button onClick={() => setFilters({})}>
+                Clear Filters
+              </button>
+            </div>
+          </div>
+          
           {/* Opps */}
           <div style={{ marginTop: 20, background: "white", padding: 20 }}>
             {opps.map((opp) => (

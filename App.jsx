@@ -172,7 +172,21 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
 
   reader.readAsText(file);
 };
+  const updateScore = (index, criteriaName, value) => {
+    let num = Number(value);
 
+    if (num > 5) num = 5;
+    if (num < 1) num = 1;
+
+    setOpps((prev) => {
+      const updated = [...prev];
+      updated[index] = {
+        ...updated[index],
+        [criteriaName]: num,
+      };
+      return updated;
+    });
+  };
   // ✅ CONVERT METRICS → AI SCORES
   const convertToOpportunity = async () => {
     if (!name) return;
@@ -198,18 +212,6 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
       cleaned = cleaned.replace(/```json/g, "").replace(/```/g, "");
 
       const scores = JSON.parse(cleaned);
-
-  const updateScore = (index, criteriaName, value) => {
-    let num = Number(value);
-
-    if (num > 5) num = 5;
-    if (num < 1) num = 1;
-
-    const updated = [...opps];
-    updated[index][criteriaName] = num;
-
-    setOpps(updated);
-  };
 
       
       const newOpp = { name };

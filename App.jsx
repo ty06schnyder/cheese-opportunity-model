@@ -147,7 +147,10 @@ export default function App() {
 
         const scores = JSON.parse(cleaned);
 
-        const newOpp = { name: productName };
+        const newOpp = {
+          id: Date.now() + Math.random(),
+          name: productName,
+        };
 
         criteria.forEach((c) => {
           newOpp[c] = scores[c] || 3;
@@ -172,20 +175,19 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
 
   reader.readAsText(file);
 };
-  const updateScore = (index, criteriaName, value) => {
+  const updateScore = (id, criteriaName, value) => {
     let num = Number(value);
 
     if (num > 5) num = 5;
     if (num < 1) num = 1;
 
-    setOpps((prev) => {
-      const updated = [...prev];
-      updated[index] = {
-        ...updated[index],
-        [criteriaName]: num,
-      };
-      return updated;
-    });
+    setOpps((prev) =>
+      prev.map((opp) =>
+        opp.id === id
+          ? { ...opp, [criteriaName]: num }
+          : opp
+      )
+    );
   };
   // ✅ CONVERT METRICS → AI SCORES
   const convertToOpportunity = async () => {
@@ -214,7 +216,10 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
       const scores = JSON.parse(cleaned);
 
       
-      const newOpp = { name };
+      const newOpp = {
+        id: Date.now() + Math.random(),
+        name,
+      };
 
       criteria.forEach((c) => {
         newOpp[c] = scores[c] || 3;
@@ -434,7 +439,7 @@ const chartOptions = {
 
           {/* Opps */}
           <div style={{ marginTop: 20, background: "white", padding: 20 }}>
-            {opps.map((opp, i) => (
+            {opps.map((opp) => (
               <div key={i}>
                 <strong>{opp.name}</strong>
 
@@ -442,7 +447,7 @@ const chartOptions = {
                   {criteria.map((c) => (
                     <div
   onClick={() => {
-  setEditing(`${i}-${c}`);
+  setEditing(`${opp.id}-${c}`);
   setEditValue(opp[c]); // ✅ preload current value
 }}
   style={{
@@ -455,7 +460,7 @@ const chartOptions = {
     cursor: "pointer",
   }}
 >
-  {editing === `${i}-${c}` ? (
+  {editing === `${opp.id}-${c}` ? (
     <input
   type="number"
   min="1"
@@ -465,13 +470,13 @@ const chartOptions = {
   onChange={(e) => setEditValue(e.target.value)}
   onBlur={() => {
     setTimeout(() => {
-      updateScore(i, c, editValue);
+      updateScore(opp.id, c, editValue);
       setEditing(null);
     }, 100);
   }}
   onKeyDown={(e) => {
     if (e.key === "Enter") {
-      updateScore(i, c, editValue);
+      updateScore(opp.id, c, editValue);
       setEditing(null);
     }
   }}

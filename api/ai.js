@@ -51,9 +51,33 @@ Example:
     // ✅ =========================
     else if (body.type === "insights") {
       prompt = `
-You are a strategy consultant.
 
-Analyze these opportunities:
+You are a strategy and commercial insights analyst specializing in dairy, cheese, and snacking products.
+
+You may be given a mix of:
+- FrieslandCampina products
+- Competitor products
+- Or both
+
+First, determine what type of analysis is required:
+
+1. If the dataset includes ONLY FrieslandCampina products:
+→ Focus on INTERNAL optimization
+→ Recommend how Friesland can prioritize, expand, or improve its own portfolio
+
+2. If the dataset includes competitors:
+→ Focus on COMPETITIVE advantage
+→ Recommend how Friesland can win against competitors
+
+3. If the dataset includes BOTH:
+→ Combine both perspectives:
+   - how Friesland products compare
+   - where Friesland can gain share
+   - where to invest or defend
+
+Reference Data:
+You are given:
+1. A set of cheese products with quantitative performance scores across key criteria (e.g., Growth, Impact, Ease, Competition, Trend).
 
 ${JSON.stringify(body.opportunities)}
 
@@ -63,27 +87,157 @@ ${body.criteria.join(", ")}
 Weights:
 ${JSON.stringify(body.weights)}
 
+2. A structured overview of FrieslandCampina’s priority brands, including their positioning, heritage, product range, formats, role in the portfolio, and competitive lens.
+
+1. Royal Hollandia®
+Positioning: Modern, snackable Dutch cheese brand
+Target use cases:
+On-the-go snacking
+Lunchboxes
+Entertaining boards
+Formats:
+Cubes, snack packs, resealable packs
+Recent strategy:
+Expansion into entry-price packs to drive trial and accessibility
+Role in portfolio:
+Key growth engine in snacking/convenience segment
+Designed to capture share from:
+Babybel (Bel Group)
+Sargento Balanced Breaks
+Private-label snack cheeses
+
+2. Rembrandt® (formerly “A Dutch Masterpiece”)
+Positioning: Premium, artisanal Dutch cheese line
+Rebrand: 2026 repositioning to strengthen emotional and premium appeal
+Core SKUs:
+6-Month Aged Gouda
+12-Month PDO Gouda
+Robusto (firmer, aged profile)
+Goat Gouda
+Quality signal:
+Award-winning at global cheese competitions
+Role in portfolio:
+Margin-accretive premium tier
+Targets:
+Specialty cheese shoppers
+Charcuterie/entertaining occasions
+Competitive lens:
+Directly competes with:
+Murray’s / specialty counters
+Imported European premium cheeses (Comté, Parmigiano Reggiano)
+
+3. Parrano®
+Positioning: Hybrid innovation cheese (Gouda texture × Parmesan flavor)
+Product characteristics:
+Aged ~5 months
+Nutty, savory flavor profile
+Easier slicing/melting vs Parmesan
+Role in portfolio:
+Differentiation platform
+Enables FrieslandCampina to:
+Compete in Italian-cheese usage occasions
+Create a unique subcategory (not purely substitutable)
+Competitive lens:
+Competes with:
+Parmesan, Asiago, Pecorino
+Blended grated cheeses
+
+4. Gayo Azul®
+Positioning: Hispanic/Latin American cheese line
+Key products:
+Cotija-style cheese
+Fresh and crumbly applications
+Strategic importance:
+Targets the fast-growing Hispanic dairy segment in the U.S.
+Role in portfolio:
+Core demographic-driven growth lever
+Expands FrieslandCampina beyond European cheese heritage
+Competitive lens:
+Competes with:
+Cacique
+El Mexicano
+Regional/private-label Hispanic cheeses
+
+5. Melkbus® Truffle
+Positioning: Ultra-premium, flavor-forward specialty cheese
+Product focus:
+Gouda-style cheese infused with truffle
+Consumer target:
+Foodies
+Specialty retail and charcuterie occasions
+Key attributes:
+High perceived indulgence
+Strong differentiation via flavor innovation
+Role in portfolio:
+Top-tier premium / niche luxury segment
+Used to:
+Elevate brand perception
+Capture high-margin specialty sales
+Compete in gourmet retail environments
+Competitive lens:
+Competes with:
+Truffle cheeses from specialty importers
+High-end private label gourmet cheeses
+European artisanal brands
+
+6. Private Label / Retailer Brands
+Scope: FrieslandCampina supplies cheeses sold under retailer-owned brands across the U.S.
+Products include:
+Gouda (young/aged/flavored)
+Edam, Maasdam
+Goat and specialty cheeses
+Channels:
+Grocery chains, club stores, and mass retailers
+Role in portfolio:
+Critical volume engine
+Strengthens retailer partnerships and shelf access
+Enables participation across value price tiers
+Strategic implications:
+Provides hidden market share not visible in branded scans
+Balances portfolio economics (volume vs margin)
+Defends against competitors owning retailer assortments
+
+Your job is NOT just to describe competitors — your job is to identify how FrieslandCampina can WIN.
+You must analyze everything through this lens:
+“How can FrieslandCampina use this information to drive growth, win share, or exploit gaps?”
+Instructions:
+
+1. Identify where competitors are succeeding (growth, pricing, positioning, format)
+2. Detect gaps, weaknesses, or inefficiencies in the market
+3. Highlight opportunities that FrieslandCampina can realistically exploit
+4. Recommend specific commercial or product actions
+5. Connect all insights about competitor's back to Friesland Campina and it's respective brands
+
+Focus on:
+- price positioning advantages
+- unmet consumer needs
+- whitespace in formats (snacking, premium, protein, etc.)
+- distribution or accessibility gaps
+- over-indexed competition areas to avoid
+
 IMPORTANT: Format your response EXACTLY like this, make sure to follow the rules to a tee:
 
+Output format:
+
 Top Opportunity:
-[Name]
+[Describe the most concrete, actionable opportunity for FrieslandCampina]
 
-Where to Focus:
-[1-2 sentences]
+What We See in the Market:
+[Explain what competitors are doing successfully — be specific]
 
-What to Do:
-- Action 1
-- Action 2
-- Action 3
+Where Friesland Can Win:
+[Explain the strategic advantage FrieslandCampina has]
 
-Why It Matters:
-[2-3 sentences]
+Recommended Action:
+- [Specific action 1]
+- [Specific action 2]
+- [Specific action 3]
 
-Second Priority:
-[Name]
+Why This Works:
+[Connect back to metrics + market dynamics]
 
 Key Risk:
-[1-2 sentences]
+[What could go wrong or limit success]
 
 Rules:
 - No markdown (** or ###)

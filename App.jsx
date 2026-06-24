@@ -169,6 +169,10 @@ export default function App() {
           newOpp[c] = scores[c] || 3;
         });
 
+        metrics.forEach((m) => {
+          newOpp[m.name] = Number(m.value);
+        });
+
         // ✅ prevent duplicates (within this upload)
 if (!newOpps.some((o) => o.name === newOpp.name)) {
   newOpps.push(newOpp);

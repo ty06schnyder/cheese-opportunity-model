@@ -1,5 +1,8 @@
 import React, { useState } from "react"; 
 
+import { Pie } from "react-chartjs-2";
+import { ArcElement } from "chart.js";
+
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,7 +13,14 @@ import {
   Legend,
 } from "chart.js";
 
-ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+ChartJS.register(
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  ArcElement // ✅ ADD THIS
+);
 
 const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
 // Test
@@ -121,7 +131,7 @@ export default function App() {
 
           return {
             name: header,
-            value: (row[i] || "").replace(/,/g, "").trim(), // ✅ fixes 12,731
+            value: (row[i] || "").replace(/,/g, "").replace("%", "").trim(), // ✅ fixes 12,731
           };
         })
         .filter(Boolean);
@@ -269,7 +279,12 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
   const visibleForChart = ranked.filter(
     (opp) => !hiddenProducts.includes(opp.id)
   );
+  const dollarShareKey = "Dollar Share of Category- Int Fresh";
 
+  const hasDollarShare =
+  ranked.length > 0 &&
+  ranked[0][dollarShareKey] !== undefined;
+  
   const chartSorted = [...visibleForChart].sort((a, b) => {
     if (chartMetric === "total") return b.total - a.total;
     return b[chartMetric] - a[chartMetric];
@@ -293,6 +308,52 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
     ],
   };
 
+let pieData = null;
+
+if (hasDollarShare) {
+  const total = ranked.reduce(
+    (sum, opp) => sum + Number(opp[dollarShareKey] || 0),
+    0
+  );
+
+  pieData = {
+    labels: ranked.map((o) =>
+      o.name.length > 25
+        ? o.name.substring(0, 25) + "..."
+        : o.name
+    ),
+    datasets: [
+      {
+        data: ranked.map((o) => {
+          const value = Number(o[dollarShareKey] || 0);
+          return total > 0 ? (value / total) * 100 : 0; // ✅ % of total
+        }),
+        backgroundColor: [
+          "#2563eb",
+          "#16a34a",
+          "#facc15",
+          "#fb923c",
+          "#ef4444",
+          "#8b5cf6",
+          "#14b8a6",
+        ],
+      },
+    ],
+  };
+}
+
+const pieOptions = {
+  plugins: {
+    tooltip: {
+      callbacks: {
+        label: function (context) {
+          return context.raw.toFixed(1) + "%";
+        },
+      },
+    },
+  },
+};
+  
 const chartOptions = {
   responsive: true,
   plugins: {
@@ -649,6 +710,20 @@ const chartOptions = {
   <div style={{ background: "white", padding: 20, borderRadius: 10 }}>
     <Bar data={chartData} options={chartOptions} />
   </div>
+  {hasDollarShare && pieData && (
+  <div
+    style={{
+      marginTop: 30,
+      background: "white",
+      padding: 20,
+      borderRadius: 10,
+    }}
+  >
+    <h3>Market Share (Dollar Share of Category - Int Fresh)</h3>
+
+    <Pie data={pieData} options={pieOptions} />
+  </div>
+)}
 </div>
           </div>
 

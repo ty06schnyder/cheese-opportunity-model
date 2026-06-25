@@ -786,7 +786,7 @@ const chartOptions = {
 )}
 </div>
           </div>
-
+          </div>
           {/* Buttons */}
           <div style={{ marginTop: 15, display: "flex", gap: 10 }}>
             <button onClick={generateInsights}>

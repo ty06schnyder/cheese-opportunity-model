@@ -835,8 +835,8 @@ const chartOptions = {
         </button>
       </div>
     </div>
+  </div>
   )}
 )}
-    </div>
   );
 }

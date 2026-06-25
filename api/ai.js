@@ -261,7 +261,7 @@ ${body.userInput}
 Update and refine your recommendations based on this new information.
 
 Instructions:
-- No markdown (** or ###), don't try to bold text either
+- No markdown (** or ###), don't try to bold text either (do not use asterisk's anywhere in your response)
 - Do NOT repeat the original insights word for word
 - Modify or improve recommendations based on the new input
 - Be specific and actionable

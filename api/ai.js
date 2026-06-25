@@ -261,6 +261,7 @@ ${body.userInput}
 Update and refine your recommendations based on this new information.
 
 Instructions:
+- Do NOT include any # or *
 - Do NOT repeat the original insights word for word
 - Modify or improve recommendations based on the new input
 - Be specific and actionable

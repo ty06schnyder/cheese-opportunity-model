@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+export default async function handler(req, res) { //test
   try {
     const body =
       typeof req.body === "string"

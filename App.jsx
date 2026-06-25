@@ -728,7 +728,9 @@ const chartOptions = {
   >
     <h3>Market Share (Dollar Share of Category - Int Fresh)</h3>
 
-    <Pie data={pieData} options={pieOptions} />
+    <div style={{ width: 300, margin: "0 auto" }}>
+      <Pie data={pieData} options={pieOptions} />
+    </div>
   </div>
 )}
 </div>

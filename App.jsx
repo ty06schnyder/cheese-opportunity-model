@@ -283,11 +283,14 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
   const visibleForChart = ranked.filter(
     (opp) => !hiddenProducts.includes(opp.id)
   );
-  const dollarShareKey = "Dollar Share of Category- Int Fresh";
+  const dollarShareKey = criteria.find((c) =>
+    c.toLowerCase().includes("dollar share")
+  );
 
-  const hasDollarShare =
-  ranked.length > 0 &&
-  ranked[0][dollarShareKey] !== undefined;
+  const hasDollarShare = ranked.some(
+    (opp) => opp[dollarShareKey] !== undefined
+  );
+
   
   const chartSorted = [...visibleForChart].sort((a, b) => {
     if (chartMetric === "total") return b.total - a.total;
@@ -312,25 +315,31 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
     ],
   };
 
+const dollarShareKey = Object.keys(opps[0] || {}).find((key) =>
+  key.toLowerCase().includes("dollar share")
+);
+
+const hasDollarShare = !!dollarShareKey;
+
 let pieData = null;
 
 if (hasDollarShare) {
-  const total = ranked.reduce(
+  const total = visibleForChart.reduce(
     (sum, opp) => sum + Number(opp[dollarShareKey] || 0),
     0
   );
 
   pieData = {
-    labels: ranked.map((o) =>
+    labels: visibleForChart.map((o) =>
       o.name.length > 25
         ? o.name.substring(0, 25) + "..."
         : o.name
     ),
     datasets: [
       {
-        data: ranked.map((o) => {
+        data: visibleForChart.map((o) => {
           const value = Number(o[dollarShareKey] || 0);
-          return total > 0 ? (value / total) * 100 : 0; // ✅ % of total
+          return total > 0 ? (value / total) * 100 : 0;
         }),
         backgroundColor: [
           "#2563eb",

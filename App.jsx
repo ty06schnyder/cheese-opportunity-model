@@ -40,7 +40,7 @@ export default function App() {
   const [editValue, setEditValue] = useState("");
   const [metrics, setMetrics] = useState([{ name: "", value: "" }]);
   const [name, setName] = useState("");
-
+  const [followup, setFollowup] = useState("");
   const [insights, setInsights] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -54,7 +54,43 @@ export default function App() {
 
     setOpps(opps.map((o) => ({ ...o, [newName]: 3 })));
   };
+  
+  const refineInsights = async () => {
+    if (!followup) return;
 
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "followup",
+          criteria,
+          weights,
+          opportunities: ranked,
+          previousInsights: insights,
+          userInput: followup,
+        }),
+      });
+
+      const data = await res.json();
+
+      // ✅ Replace insights with refined version
+      setInsights(data.text);
+
+      // ✅ Clear input
+      setFollowup("");
+
+    } catch (e) {
+      console.error(e);
+      alert("Failed to refine insights");
+    } finally {
+      setLoading(false);
+    }
+  };
   const removeCriteria = (name) => {
     setCriteria(criteria.filter((c) => c !== name));
 
@@ -437,7 +473,7 @@ const chartOptions = {
       setLoading(false);
     }
   };
-
+  
   const getColor = (v) =>
     v >= 5
       ? "#16a34a"
@@ -762,23 +798,45 @@ const chartOptions = {
           </div>
 
           {/* AI Output */}
-          <div style={{ marginTop: 20 }}>
-            {loading && <p>Generating insights...</p>}
-            {insights && (
-              <div
-  style={{
-    background: "white",
-    padding: 16,
-    whiteSpace: "pre-line", // ✅ THIS FIXES EVERYTHING
-    lineHeight: 1.6,
-  }}
->
-  {insights}
+<div style={{ marginTop: 20 }}>
+  {loading && <p>Generating insights...</p>}
+
+  {insights && (
+    <>
+      {/* ✅ INSIGHTS BOX */}
+      <div
+        style={{
+          background: "white",
+          padding: 16,
+          whiteSpace: "pre-line",
+          lineHeight: 1.6,
+        }}
+      >
+        {insights}
+      </div>
+
+      {/* ✅ FOLLOW-UP INPUT (ADD THIS BELOW) */}
+      <div style={{ marginTop: 15 }}>
+        <textarea
+          placeholder="Add more context (pricing, brand constraints, goals, etc.)"
+          value={followup}
+          onChange={(e) => setFollowup(e.target.value)}
+          style={{
+            width: "100%",
+            height: 80,
+            padding: 10,
+          }}
+        />
+
+        <button
+          style={{ marginTop: 10 }}
+          onClick={refineInsights}
+        >
+          Refine Insights
+        </button>
+      </div>
+    </>
+  )}
 </div>
-            )}
-          </div>
-        </>
-      )}
-    </div>
   );
 }

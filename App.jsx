@@ -786,7 +786,6 @@ const chartOptions = {
 )}
 </div>
           </div>
-          </div>
           {/* Buttons */}
           <div style={{ marginTop: 15, display: "flex", gap: 10 }}>
             <button onClick={generateInsights}>
@@ -802,7 +801,7 @@ const chartOptions = {
   {loading && <p>Generating insights...</p>}
 
   {insights && (
-    <>
+    <div>
       {/* ✅ INSIGHTS BOX */}
       <div
         style={{
@@ -835,7 +834,7 @@ const chartOptions = {
           Refine Insights
         </button>
       </div>
-    </>
+    </div>
   )}
   </>
 )}

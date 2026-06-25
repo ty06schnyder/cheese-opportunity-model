@@ -1,11 +1,10 @@
 export default async function handler(req, res) {
   try {
-    const type = body.type;
     const body =
       typeof req.body === "string"
         ? JSON.parse(req.body)
         : req.body || {};
-
+    const type = body.type;
     let prompt = "";  
 
     // ✅ MODE 1: METRICS → SCORES
@@ -17,10 +16,10 @@ You are a data processing engine for the U.S. cheese category.
 Convert the following business metrics into scores from 1 to 5. Compare all products relative to all the other products on the list as well as just general real world metrics.
 
 Metrics:
-${JSON.stringify(metrics, null, 2)}
+${JSON.stringify(body.metrics, null, 2)}
 
 Criteria:
-${criteria.join(", ")}
+${body.criteria.join(", ")}
 
 Guidelines:
 - ~$15M in sales = strong
@@ -271,11 +270,11 @@ Return a refined set of recommendations.
 `;
 }
     // ✅ Safety: missing type
-    else {
-      return res.status(400).json({
-        text: "Invalid request type",
-      });
-    }
+else {
+   return res.status(400).json({
+     text: "Invalid request type",
+  });
+ }
 
     // ✅ Add timeout protection (prevents hanging forever)
     const controller = new AbortController();

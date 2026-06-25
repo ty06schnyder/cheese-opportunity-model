@@ -16,10 +16,10 @@ You are a data processing engine for the U.S. cheese category.
 Convert the following business metrics into scores from 1 to 5. Compare all products relative to all the other products on the list as well as just general real world metrics.
 
 Metrics:
-${JSON.stringify(body.metrics)}
+${JSON.stringify(metrics, null, 2)}
 
 Criteria:
-${body.criteria.join(", ")}
+${criteria.join(", ")}
 
 Guidelines:
 - ~$15M in sales = strong

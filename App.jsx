@@ -183,11 +183,12 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
       }
     }
 
-    // ✅ Add ALL opportunities at once
-    setOpps((prev) => [...prev, ...newOpps]);
-
-    // ✅ Go straight to model tab
-    setTab("model");
+    if (newOpps.length > 0) {
+      setOpps((prev) => [...prev, ...newOpps]);
+      setTab("model");
+    } else {
+      alert("No valid data was processed. Check your CSV format.");
+    }
   };
 
   reader.readAsText(file);

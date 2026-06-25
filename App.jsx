@@ -837,5 +837,6 @@ const chartOptions = {
     </div>
   )}
 )}
+    </div>
   );
 }

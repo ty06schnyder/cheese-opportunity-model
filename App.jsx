@@ -283,13 +283,6 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
   const visibleForChart = ranked.filter(
     (opp) => !hiddenProducts.includes(opp.id)
   );
-  const dollarShareKey = criteria.find((c) =>
-    c.toLowerCase().includes("dollar share")
-  );
-
-  const hasDollarShare = ranked.some(
-    (opp) => opp[dollarShareKey] !== undefined
-  );
 
   
   const chartSorted = [...visibleForChart].sort((a, b) => {

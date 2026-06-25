@@ -248,7 +248,28 @@ Rules:
 - DO NOT write everything in one paragraph
 `;
     }
+if (type === "followup") {
+  prompt = `
+You are a strategic advisor helping analyze CPG product opportunities.
 
+You previously generated the following insights:
+${previousInsights}
+
+The user has now added more context:
+${userInput}
+
+Update and refine your recommendations based on this new information. You are allowed
+to exceed previously described response lengths to add more information and detail.
+
+Instructions:
+- Do NOT repeat the original insights word for word
+- Modify or improve recommendations based on the new input
+- Be specific and actionable
+- Consider pricing, positioning, competition, and strategy
+- Focus on practical business decisions
+
+Return a refined set of recommendations.
+`;
     // ✅ Safety: missing type
     else {
       return res.status(400).json({

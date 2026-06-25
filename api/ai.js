@@ -1,7 +1,7 @@
-export default async function handler(req, res) { //test
+export default async function handler(req, res) {
   try {
     const body =
-      typeof req.body === "string"
+      typeof req.body === "string" //test
         ? JSON.parse(req.body)
         : req.body || {};
     const type = body.type;

@@ -539,7 +539,7 @@ const chartOptions = {
 
       {/* ✅ MODEL TAB */}
       {tab === "model" && (
-        <>
+        <div>
           {/* Criteria pills */}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {criteria.map((c) => (
@@ -836,7 +836,6 @@ const chartOptions = {
       </div>
     </div>
   )}
-  </>
 )}
   );
 }

@@ -271,6 +271,7 @@ Key Risk:
 [What could go wrong or limit success]
 
 Rules:
+- Use exact percentages or numbers when discussing the growth of a specific metric
 - No markdown (** or ###)
 - Keep concise and actionable
 - Each section must be on its own line
@@ -292,6 +293,7 @@ ${body.userInput}
 Update and refine your recommendations based on this new information.
 
 Instructions:
+- Use exact percentages or numbers when discussing the growth of a specific metric
 - No markdown (** or ###), don't try to bold text either (do not use asterisk's anywhere in your response)
 - Do NOT repeat the original insights word for word
 - Modify or improve recommendations based on the new input

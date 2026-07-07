@@ -44,6 +44,7 @@ export default function App() {
   const [insights, setInsights] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [categoryFilter, setCategoryFilter] = useState("All");
   // ✅ ADD / REMOVE CRITERIA
   const addCriteria = () => {
     const newName = prompt("Enter new criteria");
@@ -195,10 +196,31 @@ export default function App() {
         cleaned = cleaned.replace(/```json/g, "").replace(/```/g, "");
 
         const scores = JSON.parse(cleaned);
+        const classRes = await fetch("/api/ai", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            type: "classification",
+            productName,
+            metrics,
+          }),
+        });
+
+        const classData = await classRes.json();
+
+        const classification = JSON.parse(
+          classData.text
+            .replace(/```json/g, "")
+            .replace(/```/g, "")
+            .trim()
+        );
 
         const newOpp = {
           id: Date.now() + Math.random(),
           name: productName,
+          category: classification.category,
         };
 
         criteria.forEach((c) => {
@@ -306,17 +328,32 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
   });
 
   const filtered = scored.filter((opp) => {
-    return Object.entries(filters).every(([key, value]) => {
-      if (!value) return true;
-      return opp[key] >= value;
-    });
+    const categoryMatch =
+      categoryFilter === "All" ||
+      opp.category === categoryFilter;
+
+    const criteriaMatch =
+      Object.entries(filters).every(([key, value]) => {
+        if (!value) return true;
+        return opp[key] >= value;
+      });
+
+    return categoryMatch && criteriaMatch;
   });
 
   const ranked = [...filtered].sort((a, b) => {
     if (sortBy === "total") return b.total - a.total;
     return b[sortBy] - a[sortBy];
   });
-
+  
+  const availableCategories = [
+    "All",
+    ...new Set(
+      opps
+        .map((o) => o.category)
+        .filter(Boolean)
+    ),
+  ];
   const visibleForChart = ranked.filter(
     (opp) => !hiddenProducts.includes(opp.id)
   );
@@ -578,6 +615,21 @@ const chartOptions = {
           <div style={{ marginTop: 20, marginBottom: 20 }}>
             <h3>Controls</h3>
 
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Category: </label>
+
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+              >
+                {availableCategories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            </div>
             {/* SORT */}
             <div style={{ marginBottom: 10 }}>
               <label>Sort by: </label>

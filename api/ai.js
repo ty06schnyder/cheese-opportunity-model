@@ -46,9 +46,40 @@ Example:
 `;
     }
 
-    // ✅ =========================
-    // ✅ MODE 2: INSIGHTS
-    // ✅ =========================
+    else if (body.type === "classification") {
+      prompt = `
+    You are a cheese category classification engine.
+
+    Classify this product into ONE category.
+  
+    Product:
+    ${body.productName}
+
+    Metrics:
+    ${JSON.stringify(body.metrics)}
+
+    Possible categories:
+    - Gouda
+    - Cheddar
+    - Parmesan
+    - Hispanic
+    - Goat
+    - Snack Cheese
+    - Specialty
+    - Other
+
+    Rules:
+    - Return ONLY raw JSON
+    - No markdown
+    - No explanation
+
+    Example:
+    {
+      "category": "Gouda"
+    }
+    `;
+    }
+      
     else if (body.type === "insights") {
       prompt = `
 

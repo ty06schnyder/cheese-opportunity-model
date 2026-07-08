@@ -24,6 +24,26 @@ ChartJS.register(
 
 const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
 // Test
+
+const holidayMap = {
+  Q1: ["New Year", "Big Game", "Easter"],
+  Q2: ["Memorial Day", "July 4th"],
+  Q3: ["Back to School", "Labor Day", "Halloween"],
+  Q4: ["Holiday", "Black Friday"],
+};
+
+function weekToEvent(week) {
+  if (week <= 5) return "New Year";
+  if (week <= 8) return "Big Game";
+  if (week <= 16) return "Easter";
+  if (week <= 22) return "Memorial Day";
+  if (week <= 28) return "July 4th";
+  if (week <= 36) return "Back to School";
+  if (week <= 38) return "Labor Day";
+  if (week <= 44) return "Halloween";
+
+  return "Holiday";
+}
 export default function App() {
   const [tab, setTab] = useState("input");
   const [promotionData, setPromotionData] = useState([]);
@@ -222,6 +242,11 @@ export default function App() {
           id: Date.now() + Math.random(),
           name: productName,
           category: classification.category,
+
+          // AI Classification
+          category: classification.category,
+          occasion: classification.occasion,
+          priceTier: classification.priceTier,
         };
 
         criteria.forEach((c) => {
@@ -556,6 +581,38 @@ const chartOptions = {
       ? "#fb923c"
       : "#ef4444";
 
+/* ===========================
+   PROMOTION OPPORTUNITY SCORING
+=========================== */
+
+  const promotionScores = promotionData.map((item) => {
+
+    const seasonality =
+      Number(item.SeasonalityIndex || 0);
+
+    const promoLift =
+      Number(item.PromoLift || 0);
+
+    const velocity =
+      Number(item.Velocity || 0);
+
+    const distributionGap =
+      Number(item.DistributionGap || 0);
+
+    const score =
+      seasonality * 0.4 +
+      promoLift * 0.3 +
+      velocity * 0.2 +
+      distributionGap * 0.1;
+
+    return {
+      ...item,
+      promotionScore: Number(score.toFixed(2))
+    };
+  });
+
+  return (
+  
   return (
     <div style={{ padding: 40, background: "#f6f8fb" }}>
       <h1>Opportunity Prioritization Model</h1>
@@ -568,7 +625,7 @@ const chartOptions = {
           Promotion Optimizer
         </button>
       </div>
-
+      
       {/* ✅ INPUT TAB */}
       {tab === "input" && (
         <div style={{ background: "white", padding: 20 }}>

@@ -47,7 +47,6 @@ function weekToEvent(week) {
 export default function App() {
   const [tab, setTab] = useState("input");
   const [promotionData, setPromotionData] = useState([]);
-  const [promotionCalendar, setPromotionCalendar] = useState([]);
   const [criteria, setCriteria] = useState(defaultCriteria);
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("total");
@@ -1094,79 +1093,6 @@ const chartOptions = {
           }}
         >
           {insights}
-        </div>
-      )}
-      {promotionCalendar.length > 0 && (
-        <div
-          style={{
-            marginTop: 30,
-            background: "white",
-            padding: 20,
-            borderRadius: 10,
-          }}
-        >
-          <h2>Promotion Calendar</h2>
-
-          {["Q1", "Q2", "Q3", "Q4"].map((quarter) => (
-            <div
-              key={quarter}
-              style={{
-                marginBottom: 25,
-              }}
-            >
-              <h3>{quarter}</h3>
-
-              {promotionCalendar
-                .filter((item) => {
-                  if (quarter === "Q1")
-                    return ["New Year", "Big Game", "Easter"].includes(item.event);
-
-                  if (quarter === "Q2")
-                    return ["Memorial Day", "July 4th"].includes(item.event);
-
-                  if (quarter === "Q3")
-                    return [
-                      "Back to School",
-                      "Labor Day",
-                      "Halloween",
-                    ].includes(item.event);
-
-                  return [
-                    "Holiday",
-                    "Black Friday",
-                  ].includes(item.event);
-                })
-                .map((item, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      background: "#f3f4f6",
-                      padding: 12,
-                      marginBottom: 10,
-                      borderRadius: 8,
-                    }}
-                  >
-                    <strong>{item.event}</strong>
-
-                    <div>
-                      Category: {item.category}
-                    </div>
-
-                    <div>
-                      Brand: {item.brand}
-                    </div>
-
-                    <div>
-                      Priority: {item.priority}
-                    </div>
-
-                    <div>
-                      Reason: {item.reason}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          ))}
         </div>
       )}
     </div>

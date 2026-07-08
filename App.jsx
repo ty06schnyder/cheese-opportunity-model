@@ -1,6 +1,6 @@
 import React, { useState } from "react"; //testt
 
-import { Pie } from "react-chartjs-2"; 
+import { Pie } from "react-chartjs-2"; //test
 import { ArcElement } from "chart.js";
 
 import { Bar } from "react-chartjs-2"; //test

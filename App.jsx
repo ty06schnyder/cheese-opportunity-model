@@ -610,8 +610,6 @@ const chartOptions = {
       promotionScore: Number(score.toFixed(2))
     };
   });
-
-  return (
   
   return (
     <div style={{ padding: 40, background: "#f6f8fb" }}>

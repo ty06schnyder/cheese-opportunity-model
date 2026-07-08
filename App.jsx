@@ -47,6 +47,7 @@ function weekToEvent(week) {
 export default function App() {
   const [tab, setTab] = useState("input");
   const [promotionData, setPromotionData] = useState([]);
+  const [promotionCalendar, setPromotionCalendar] = useState([]);
   const [criteria, setCriteria] = useState(defaultCriteria);
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("total");
@@ -569,7 +570,23 @@ const chartOptions = {
       setLoading(false);
     }
   };
-  
+
+  const generatePromotions = async () => {
+    const res = await fetch("/api/ai", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        type: "promotion",
+        data: promotionData,
+      }),
+    });
+
+    const data = await res.json();
+
+    setInsights(data.text);
+  };
   const getColor = (v) =>
     v >= 5
       ? "#16a34a"
@@ -986,7 +1003,52 @@ const chartOptions = {
   {tab === "promotion" && (
     <div>
       <h2>Promotion Optimizer</h2>
+      <div
+        style={{
+          background: "white",
+          padding: 20,
+          borderRadius: 10,
+          marginBottom: 20,
+          border: "1px solid #e5e7eb",
+        }}
+      >
+        <h3>Required IRI Inputs</h3>
 
+        <div style={{ marginBottom: 15 }}>
+          <strong>Minimum Required</strong>
+          <ul>
+            <li>Week Ending</li>
+            <li>Product Name</li>
+            <li>Dollar Sales ($)</li>
+            <li>Unit Sales</li>
+            <li>Average Price</li>
+          </ul>
+        </div>
+
+        <div style={{ marginBottom: 15 }}>
+          <strong>Recommended</strong>
+          <ul>
+            <li>Feature %</li>
+            <li>Display %</li>
+            <li>Feature & Display %</li>
+            <li>TDP / Distribution</li>
+            <li>Velocity</li>
+            <li>Promo Volume %</li>
+          </ul>
+        </div>
+
+  <      div>
+          <strong>Ideal (Best Results)</strong>
+          <ul>
+            <li>Promo Lift</li>
+            <li>Incremental Volume</li>
+            <li>Incremental Sales</li>
+            <li>Competitive Promotion Activity</li>
+            <li>Share of Category</li>
+            <li>ACV Distribution</li>
+          </ul>
+        </div>
+      </div>
       <p>
         Upload weekly IRI data containing:
       </p>
@@ -1011,6 +1073,102 @@ const chartOptions = {
         accept=".csv"
         onChange={handlePromotionUpload}
       />
+
+      <button
+        style={{ marginTop: 15 }}
+        onClick={generatePromotions}
+      >
+        Generate Promotion Recommendations
+      </button>
+
+      {loading && <p>Analyzing promotion opportunities...</p>}
+
+      {insights && (
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            marginTop: 20,
+            whiteSpace: "pre-line",
+            borderRadius: 10,
+          }}
+        >
+          {insights}
+        </div>
+      )}
+      {promotionCalendar.length > 0 && (
+        <div
+          style={{
+            marginTop: 30,
+            background: "white",
+            padding: 20,
+            borderRadius: 10,
+          }}
+        >
+          <h2>Promotion Calendar</h2>
+
+          {["Q1", "Q2", "Q3", "Q4"].map((quarter) => (
+            <div
+              key={quarter}
+              style={{
+                marginBottom: 25,
+              }}
+            >
+              <h3>{quarter}</h3>
+
+              {promotionCalendar
+                .filter((item) => {
+                  if (quarter === "Q1")
+                    return ["New Year", "Big Game", "Easter"].includes(item.event);
+
+                  if (quarter === "Q2")
+                    return ["Memorial Day", "July 4th"].includes(item.event);
+
+                  if (quarter === "Q3")
+                    return [
+                      "Back to School",
+                      "Labor Day",
+                      "Halloween",
+                    ].includes(item.event);
+
+                  return [
+                    "Holiday",
+                    "Black Friday",
+                  ].includes(item.event);
+                })
+                .map((item, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      background: "#f3f4f6",
+                      padding: 12,
+                      marginBottom: 10,
+                      borderRadius: 8,
+                    }}
+                  >
+                    <strong>{item.event}</strong>
+
+                    <div>
+                      Category: {item.category}
+                    </div>
+
+                    <div>
+                      Brand: {item.brand}
+                    </div>
+
+                    <div>
+                      Priority: {item.priority}
+                    </div>
+
+                    <div>
+                      Reason: {item.reason}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )}
   </div>

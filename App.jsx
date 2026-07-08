@@ -26,6 +26,7 @@ const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
 // Test
 export default function App() {
   const [tab, setTab] = useState("input");
+  const [promotionData, setPromotionData] = useState([]);
   const [criteria, setCriteria] = useState(defaultCriteria);
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("total");
@@ -251,6 +252,39 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
 
   reader.readAsText(file);
 };
+
+  const handlePromotionUpload = async (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const text = event.target.result;
+
+      const rows = text
+        .split("\n")
+        .map((r) => r.split(","));
+
+      const headers = rows[0];
+
+      const data = rows.slice(1).map((row) => {
+        const obj = {};
+
+        headers.forEach((h, i) => {
+          obj[h.trim()] = row[i];
+        });
+
+        return obj;
+      });
+
+      setPromotionData(data);
+    };
+
+    reader.readAsText(file);
+  };
+  
   const updateScore = (id, criteriaName, value) => {
     let num = Number(value);
 
@@ -530,6 +564,9 @@ const chartOptions = {
       <div style={{ marginBottom: 20 }}>
         <button onClick={() => setTab("input")}>Data Input</button>
         <button onClick={() => setTab("model")}>Model</button>
+        <button onClick={() => setTab("promotion")}>
+          Promotion Optimizer
+        </button>
       </div>
 
       {/* ✅ INPUT TAB */}
@@ -891,6 +928,36 @@ const chartOptions = {
           </div>
         </div>
       )}
+  {tab === "promotion" && (
+    <div>
+      <h2>Promotion Optimizer</h2>
+
+      <p>
+        Upload weekly IRI data containing:
+      </p>
+
+      <ul>
+        <li>Product Name</li>
+        <li>Category</li>
+        <li>Week Ending</li>
+        <li>Dollar Sales</li>
+        <li>Unit Sales</li>
+        <li>Average Price</li>
+        <li>Feature %</li>
+        <li>Display %</li>
+        <li>TDP / Distribution</li>
+        <li>Velocity</li>
+        <li>Promo Volume %</li>
+        <li>Promo Lift (if available)</li>
+      </ul>
+
+      <input
+        type="file"
+        accept=".csv"
+        onChange={handlePromotionUpload}
+      />
+    </div>
+  )}
   </div>
 )
 }

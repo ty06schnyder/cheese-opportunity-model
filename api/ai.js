@@ -327,6 +327,51 @@ Luxury
 Return JSON only.
 `;
 }
+
+else if (body.type === "promotion") {
+  prompt = `
+You are a dairy promotion planning expert.
+
+Analyze:
+
+${JSON.stringify(body.data)}
+
+Using:
+
+New Year
+Big Game
+Easter
+Memorial Day
+July 4th
+Back to School
+Labor Day
+Halloween
+Holiday
+
+Recommend:
+
+1. Best event
+2. Best category
+3. Best Friesland brand
+4. Why
+5. Expected impact
+
+Output exactly:
+
+Best Promotion Window:
+
+Category:
+
+Recommended Brand:
+
+Why:
+
+Expected Impact:
+
+Potential Risks:
+`;
+}
+  
 else if (body.type === "followup") {
   prompt = `
 You are a strategic advisor helping analyze CPG product opportunities.

@@ -280,6 +280,53 @@ Rules:
 - DO NOT write everything in one paragraph
 `;
     }
+
+else if (body.type === "classification") {
+  prompt = `
+  Classify the cheese product.
+
+  Product:
+  ${body.productName}
+
+  Return JSON:
+
+  {
+    "category":"",
+    "occasion":"",
+    "priceTier":""
+  }
+
+Allowed categories:
+Gouda
+Cheddar
+Hispanic (broken into cotija, queso fresco, queso blanco)
+Goat
+Snack Cheese
+Parmesan
+Havarti
+Brie
+Mozzarella
+Feta
+Blue Cheese
+Specialty
+Other
+
+Allowed occasions:
+Everyday
+Snacking
+Hosting
+Cooking
+Holiday
+
+Allowed price tiers:
+Value
+Mainstream
+Premium
+Luxury
+
+Return JSON only.
+`;
+}
 else if (body.type === "followup") {
   prompt = `
 You are a strategic advisor helping analyze CPG product opportunities.

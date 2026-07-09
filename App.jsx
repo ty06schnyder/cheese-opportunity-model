@@ -24,7 +24,20 @@ ChartJS.register(
 
 const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
 // Test
-
+const aggregateOptions = [
+  "Gouda",
+  "Cheddar",
+  "Hispanic",
+  "Goat",
+  "Snack Cheese",
+  "Parmesan",
+  "Havarti",
+  "Brie",
+  "Mozzarella",
+  "Feta",
+  "Blue Cheese",
+  "Other",
+];
 const holidayMap = {
   Q1: ["New Year", "Superbowl", "Easter"],
   Q2: ["Memorial Day", "July 4th"],
@@ -58,6 +71,10 @@ export default function App() {
   );
 
   const [opps, setOpps] = useState([]);
+  const [aggregates, setAggregates] = useState([]);
+  const [showAggregateModal, setShowAggregateModal] = useState(false);
+  const [selectedAggregateType, setSelectedAggregateType] = useState("Gouda");
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const [editing, setEditing] = useState(null);
   const [editValue, setEditValue] = useState("");
   const [metrics, setMetrics] = useState([{ name: "", value: "" }]);
@@ -384,7 +401,7 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
   const totalWeight =
     Object.values(weights).reduce((a, b) => a + b, 0) || 1;
 
-  const scored = opps.map((opp) => {
+  const scored = [...opps, ...aggregates].map((opp) => {
     const total = criteria.reduce(
       (sum, c) => sum + (opp[c] * weights[c]) / totalWeight,
       0
@@ -617,6 +634,73 @@ const chartOptions = {
       setLoading(false);
     }
   };
+
+  const createAggregate = () => {
+
+    const productsToAggregate =
+      opps.filter((o) =>
+        selectedProducts.includes(o.id)
+      );
+
+    if (!productsToAggregate.length) return;
+
+    const aggregate = {
+      id: Date.now(),
+
+      name: selectedAggregateType,
+
+      isAggregate: true,
+
+      members: productsToAggregate.map(
+        (p) => p.name
+      ),
+    };
+
+    criteria.forEach((c) => {
+
+      aggregate[c] =
+        productsToAggregate.reduce(
+          (sum, p) => sum + (p[c] || 0),
+          0
+        ) / productsToAggregate.length;
+
+    });
+
+    const dollarShareKey =
+      Object.keys(productsToAggregate[0] || {})
+        .find((key) =>
+          key.toLowerCase().includes("dollar share")
+        );
+
+    if (dollarShareKey) {
+
+      aggregate[dollarShareKey] =
+        productsToAggregate.reduce(
+          (sum, p) =>
+            sum +
+            Number(p[dollarShareKey] || 0),
+          0
+        );
+    }
+
+    setAggregates([
+      ...aggregates,
+      aggregate,
+    ]);
+
+    setOpps(
+      opps.filter(
+        (o) =>
+          !selectedProducts.includes(o.id)
+      )
+    );
+
+    setSelectedProducts([]);
+
+    setShowAggregateModal(false);
+  };
+  ``
+  
   const getColor = (v) =>
     v >= 5
       ? "#16a34a"
@@ -754,7 +838,14 @@ const chartOptions = {
           <div style={{ marginTop: 20, marginBottom: 20 }}>
             <h3>Controls</h3>
 
-
+            <button
+              onClick={() =>
+                setShowAggregateModal(true)
+              }
+            >
+              Create Aggregate
+            </button>
+            
             <div style={{ marginBottom: 10 }}>
               <label>Category: </label>
 
@@ -987,6 +1078,91 @@ const chartOptions = {
             </button>
           </div>
 
+{showAggregateModal && (
+  <div
+    style={{
+      position: "fixed",
+      top: 50,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "white",
+      padding: 20,
+      borderRadius: 10,
+      width: 500,
+      maxHeight: "70vh",
+      overflowY: "auto",
+      zIndex: 1000,
+      boxShadow: "0 4px 20px rgba(0,0,0,.2)",
+    }}
+  >
+    <h2>Create Aggregate</h2>
+
+    <select
+      value={selectedAggregateType}
+      onChange={(e) =>
+        setSelectedAggregateType(e.target.value)
+      }
+    >
+      {aggregateOptions.map((option) => (
+        <option
+          key={option}
+          value={option}
+        >
+          {option}
+        </option>
+      ))}
+    </select>
+
+    <div style={{ marginTop: 15 }}>
+      {opps.map((opp) => (
+        <div key={opp.id}>
+          <label>
+            <input
+              type="checkbox"
+              checked={selectedProducts.includes(opp.id)}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setSelectedProducts([
+                    ...selectedProducts,
+                    opp.id,
+                  ]);
+                } else {
+                  setSelectedProducts(
+                    selectedProducts.filter(
+                      (id) => id !== opp.id
+                    )
+                  );
+                }
+              }}
+            />
+
+            {opp.name}
+          </label>
+        </div>
+      ))}
+    </div>
+
+    <div
+      style={{
+        marginTop: 15,
+        display: "flex",
+        gap: 10,
+      }}
+    >
+      <button onClick={createAggregate}>
+        Create Aggregate
+      </button>
+
+      <button
+        onClick={() =>
+          setShowAggregateModal(false)
+        }
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
           {/* AI Output */}
 <div style={{ marginTop: 20 }}>
   {loading && <p>Generating insights...</p>}

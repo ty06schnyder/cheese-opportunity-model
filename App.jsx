@@ -305,6 +305,10 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
         return obj;
       });
 
+      console.log("Promotion rows:", data.length);
+      console.log("First row:", data[0]);
+      console.log("Headers:", headers);
+      
       setPromotionData(data);
     };
 

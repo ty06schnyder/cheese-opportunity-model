@@ -212,6 +212,18 @@ Focus on:
 - distribution or accessibility gaps
 - over-indexed competition areas to avoid
 
+Some opportunities may represent aggregates rather than individual products.
+
+If an opportunity represents an aggregate category (such as Gouda, Cheddar, Hispanic, Snack Cheese, etc.), analyze it at the category level rather than discussing individual UPCs.
+
+Examples:
+
+"The Gouda category represents the strongest growth opportunity..."
+
+"The Snack Cheese segment shows strong momentum..."
+
+rather than discussing only a single product.
+
 IMPORTANT: Format your response EXACTLY like this, make sure to follow the rules to a tee:
 
 Output format:

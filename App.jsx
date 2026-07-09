@@ -572,6 +572,12 @@ const chartOptions = {
   };
 
   const generatePromotions = async () => {
+    if (!promotionData.length) {
+      alert(
+        "Please upload IRI promotion data before generating recommendations."
+      );
+      return;
+    }
     try {
       setLoading(true);
 

@@ -464,6 +464,11 @@ else {
 
     const data = await response.json();
 
+    console.log(
+      "PROMOTION RESPONSE:",
+      JSON.stringify(data, null, 2)
+    );
+
     console.log("AI RESPONSE:", JSON.stringify(data));
 
     // ✅ Handle API errors safely

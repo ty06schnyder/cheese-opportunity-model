@@ -305,7 +305,7 @@ You are a dairy promotion planning expert.
 
 Analyze the following IRI data:
 
-${JSON.stringify(body.data)}
+${JSON.stringify(body.data.slice(0, 20))}
 
 Use ONLY the following events:
 
@@ -333,7 +333,7 @@ Use FrieslandCampina brands:
 - Rembrandt (Super-premium Dutch brand; known for aged Gouda and specialty cheeses)
 - Parrano (Parmesean and gouda mix, not a great melting cheese but known for snacking & charcuterie cheese)
 - Gayo Azul (Mainstream Hispanic brand; known for Hispanic cooking cheeses (Queso Blanco, Cotija, etc.), also has a gouda slices product that makes for a great melting cheese)
-- Melkbus Truffle (Premium gourmet brand; known for truffle specialty cheese and entertaining occasions.
+- Melkbus Truffle (Premium gourmet brand; known for truffle specialty cheese and entertaining occasions.)
 
 Determine:
 

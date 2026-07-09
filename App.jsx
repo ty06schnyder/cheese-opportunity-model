@@ -47,6 +47,7 @@ function weekToEvent(week) {
 export default function App() {
   const [tab, setTab] = useState("input");
   const [promotionData, setPromotionData] = useState([]);
+  const [promotionCalendar, setPromotionCalendar] = useState([]);
   const [criteria, setCriteria] = useState(defaultCriteria);
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("total");
@@ -571,20 +572,39 @@ const chartOptions = {
   };
 
   const generatePromotions = async () => {
-    const res = await fetch("/api/ai", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        type: "promotion",
-        data: promotionData,
-      }),
-    });
+    try {
+      setLoading(true);
 
-    const data = await res.json();
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "promotion",
+          data: promotionData,
+        }),
+      });
 
-    setInsights(data.text);
+      const data = await res.json();
+
+      let cleaned = data.text || "";
+
+      cleaned = cleaned
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
+
+      const calendar = JSON.parse(cleaned);
+
+      setPromotionCalendar(calendar);
+
+    } catch (e) {
+      console.error(e);
+      alert("Failed to generate promotion recommendations");
+    } finally {
+      setLoading(false);
+    }
   };
   const getColor = (v) =>
     v >= 5
@@ -1082,6 +1102,90 @@ const chartOptions = {
 
       {loading && <p>Analyzing promotion opportunities...</p>}
 
+      {promotionCalendar.length > 0 && (
+        <div
+          style={{
+            marginTop: 30,
+            background: "white",
+            padding: 20,
+            borderRadius: 10,
+          }}
+        >
+          <h2>Promotion Calendar</h2>
+
+          {["Q1", "Q2", "Q3", "Q4"].map((quarter) => (
+            <div
+              key={quarter}
+              style={{
+                marginBottom: 30,
+              }}
+            >
+              <h3>{quarter}</h3>
+
+              {promotionCalendar
+                .filter((item) => {
+                  if (quarter === "Q1") {
+                    return [
+                      "New Year",
+                      "Big Game",
+                      "Easter",
+                    ].includes(item.event);
+                  }
+
+                  if (quarter === "Q2") {
+                    return [
+                      "Memorial Day",
+                      "July 4th",
+                    ].includes(item.event);
+                  }
+
+                  if (quarter === "Q3") {
+                    return [
+                      "Back to School",
+                      "Labor Day",
+                      "Halloween",
+                    ].includes(item.event);
+                  }
+
+                  return [
+                    "Black Friday",
+                    "Holiday",
+                  ].includes(item.event);
+                })
+                .map((item, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      background: "#f3f4f6",
+                      padding: 15,
+                      borderRadius: 8,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <div>
+                      <strong>Event:</strong> {item.event}
+                    </div>
+
+                    <div>
+                      <strong>Category:</strong> {item.category}
+                    </div>
+
+                    <div>
+                      <strong>Brand:</strong> {item.brand}
+                    </div>
+
+                    <div style={{ marginTop: 8 }}>
+                      <strong>Why:</strong>
+                    </div>
+
+                    <div>{item.reason}</div>
+                  </div>
+                ))}
+            </div>
+          ))}
+        </div>
+      )}
+      
       {insights && (
         <div
           style={{

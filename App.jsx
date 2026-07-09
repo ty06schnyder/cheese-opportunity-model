@@ -838,13 +838,6 @@ const chartOptions = {
           <div style={{ marginTop: 20, marginBottom: 20 }}>
             <h3>Controls</h3>
 
-            <button
-              onClick={() =>
-                setShowAggregateModal(true)
-              }
-            >
-              Create Aggregate
-            </button>
             
             <div style={{ marginBottom: 10 }}>
               <label>Category: </label>
@@ -900,6 +893,14 @@ const chartOptions = {
                 </div>
               ))}
             </div>
+
+            <button
+              onClick={() =>
+                setShowAggregateModal(true)
+              }
+            >
+              Create Aggregate
+            </button>
             
             <div style={{ marginTop: 10 }}>
               <button onClick={() => setFilters({})}>

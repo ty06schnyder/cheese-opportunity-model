@@ -340,7 +340,7 @@ Use ONLY the following events:
 
 Q1
 - New Year
-- Big Game
+- Superbowl
 - Easter
 
 Q2
@@ -354,15 +354,15 @@ Q3
 
 Q4
 - Black Friday
-- Holiday
+- Christmas
 
 Use FrieslandCampina brands:
 
-- Royal Hollandia
-- Rembrandt
-- Parrano
-- Gayo Azul
-- Melkbus Truffle
+- Royal Hollandia (Premium Dutch cheese, known for Gouda and everyday Dutch cheeses. Good for snacking or less fancy events.)
+- Rembrandt (Super-premium Dutch brand; known for aged Gouda and specialty cheeses)
+- Parrano (Parmesean and gouda mix, not a great melting cheese but known for snacking & charcuterie cheese)
+- Gayo Azul (Mainstream Hispanic brand; known for Hispanic cooking cheeses (Queso Blanco, Cotija, etc.), also has a gouda slices product that makes for a great melting cheese)
+- Melkbus Truffle (Premium gourmet brand; known for truffle specialty cheese and entertaining occasions.
 
 Determine:
 
@@ -377,10 +377,10 @@ Format:
 
 [
   {
-    "event":"Big Game",
+    "event":"Superbowl",
     "category":"Snack Cheese",
     "brand":"Royal Hollandia",
-    "reason":"Strong snack consumption and entertaining occasions drive demand before the Big Game."
+    "reason":"Strong snack consumption and entertaining occasions drive demand before the Superbowl."
   },
   {
     "event":"Easter",

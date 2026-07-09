@@ -4,7 +4,6 @@ export default async function handler(req, res) {
       typeof req.body === "string" //test
         ? JSON.parse(req.body)
         : req.body || {};
-    const type = body.type;
     let prompt = "";  
 
     // ✅ MODE 1: METRICS → SCORES
@@ -46,39 +45,6 @@ Example:
 `;
     }
 
-    else if (body.type === "classification") {
-      prompt = `
-    You are a cheese category classification engine.
-
-    Classify this product into ONE category.
-  
-    Product:
-    ${body.productName}
-
-    Metrics:
-    ${JSON.stringify(body.metrics)}
-
-    Possible categories:
-    - Gouda
-    - Cheddar
-    - Parmesan
-    - Hispanic
-    - Goat
-    - Snack Cheese
-    - Specialty
-    - Other
-
-    Rules:
-    - Return ONLY raw JSON
-    - No markdown
-    - No explanation
-
-    Example:
-    {
-      "category": "Gouda"
-    }
-    `;
-    }
       
     else if (body.type === "insights") {
       prompt = `

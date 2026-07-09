@@ -399,6 +399,9 @@ Format:
 
 Rules:
 
+- Cite specific data from the Excel upload when explaining why promoting a certain brand is the best opportunity during that time period.
+  If no data for any Friesland brands has been uploaded, use the data that has been uploaded, identify what categories the uploaded brands or products fall under, and
+  compare them to the Friesland brand that best fits that category to eventually form your recomendations for our brands.
 - Output ONLY JSON
 - No markdown
 - No explanation outside JSON

@@ -1068,24 +1068,6 @@ const chartOptions = {
           </ul>
         </div>
       </div>
-      <p>
-        Upload weekly IRI data containing:
-      </p>
-
-      <ul>
-        <li>Product Name</li>
-        <li>Category</li>
-        <li>Week Ending</li>
-        <li>Dollar Sales</li>
-        <li>Unit Sales</li>
-        <li>Average Price</li>
-        <li>Feature %</li>
-        <li>Display %</li>
-        <li>TDP / Distribution</li>
-        <li>Velocity</li>
-        <li>Promo Volume %</li>
-        <li>Promo Lift (if available)</li>
-      </ul>
 
       <input
         type="file"

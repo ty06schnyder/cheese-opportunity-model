@@ -26,15 +26,15 @@ const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
 // Test
 
 const holidayMap = {
-  Q1: ["New Year", "Big Game", "Easter"],
+  Q1: ["New Year", "Superbowl", "Easter"],
   Q2: ["Memorial Day", "July 4th"],
   Q3: ["Back to School", "Labor Day", "Halloween"],
-  Q4: ["Holiday", "Black Friday"],
+  Q4: ["Christmas", "Black Friday"],
 };
 
 function weekToEvent(week) {
   if (week <= 5) return "New Year";
-  if (week <= 8) return "Big Game";
+  if (week <= 8) return "Superbowl";
   if (week <= 16) return "Easter";
   if (week <= 22) return "Memorial Day";
   if (week <= 28) return "July 4th";
@@ -42,7 +42,7 @@ function weekToEvent(week) {
   if (week <= 38) return "Labor Day";
   if (week <= 44) return "Halloween";
 
-  return "Holiday";
+  return "Christmas";
 }
 export default function App() {
   const [tab, setTab] = useState("input");
@@ -1109,7 +1109,7 @@ const chartOptions = {
                   if (quarter === "Q1") {
                     return [
                       "New Year",
-                      "Big Game",
+                      "Superbowl",
                       "Easter",
                     ].includes(item.event);
                   }
@@ -1131,7 +1131,7 @@ const chartOptions = {
 
                   return [
                     "Black Friday",
-                    "Holiday",
+                    "Christmas",
                   ].includes(item.event);
                 })
                 .map((item, index) => (

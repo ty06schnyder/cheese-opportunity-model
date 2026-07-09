@@ -473,6 +473,12 @@ else {
 
     // ✅ Handle API errors safely
     if (!data || !data.choices) {
+
+      console.log(
+        "OPENAI RESPONSE:",
+        JSON.stringify(data, null, 2)
+      );
+
       return res.status(500).json({
         text: "AI ERROR: " + JSON.stringify(data),
       });
@@ -483,7 +489,7 @@ else {
     });
 
   } catch (error) {
-    console.error("SERVER ERROR:", error);
+    console.error("SERVER ERROR FULL:", error);
 
     return res.status(500).json({
       text: "SERVER ERROR: " + error.message,

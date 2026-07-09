@@ -369,7 +369,9 @@ Determine:
 1. Which cheese category should be promoted
 2. Which Friesland brand should lead
 3. Which event should be targeted
-4. Why it is the best opportunity
+4. Why it is the best opportunity (Cite specific data from the IRI upload when explaining why promoting a certain brand is the best opportunity during that time period.
+If no data for any Friesland brands has been uploaded, use the data that has been uploaded, identify what categories the uploaded brands or products fall under, and
+compare them to the Friesland brand that best fits that category to eventually form your recomendations for our brands.)
 
 Return ONLY valid JSON.
 

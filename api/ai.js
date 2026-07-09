@@ -329,6 +329,11 @@ Return JSON only.
 }
 
 else if (body.type === "promotion") {
+  if (!body.data || body.data.length === 0) {
+    return res.status(400).json({
+      text: "No promotion data uploaded.",
+    });
+  }
   prompt = `
 You are a dairy promotion planning expert.
 

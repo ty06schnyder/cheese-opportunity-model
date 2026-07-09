@@ -231,7 +231,8 @@ export default function App() {
         });
 
         const classData = await classRes.json();
-
+        console.log("CLASSIFICATION RESPONSE:", classData);
+        console.log("RAW CLASSIFICATION TEXT:", classData.text);
         const classification = JSON.parse(
           classData.text
             .replace(/```json/g, "")

@@ -332,43 +332,70 @@ else if (body.type === "promotion") {
   prompt = `
 You are a dairy promotion planning expert.
 
-Analyze:
+Analyze the following IRI data:
 
 ${JSON.stringify(body.data)}
 
-Using:
+Use ONLY the following events:
 
-New Year
-Big Game
-Easter
-Memorial Day
-July 4th
-Back to School
-Labor Day
-Halloween
-Holiday
+Q1
+- New Year
+- Big Game
+- Easter
 
-Recommend:
+Q2
+- Memorial Day
+- July 4th
 
-1. Best event
-2. Best category
-3. Best Friesland brand
-4. Why
-5. Expected impact
+Q3
+- Back to School
+- Labor Day
+- Halloween
 
-Output exactly:
+Q4
+- Black Friday
+- Holiday
 
-Best Promotion Window:
+Use FrieslandCampina brands:
 
-Category:
+- Royal Hollandia
+- Rembrandt
+- Parrano
+- Gayo Azul
+- Melkbus Truffle
 
-Recommended Brand:
+Determine:
 
-Why:
+1. Which cheese category should be promoted
+2. Which Friesland brand should lead
+3. Which event should be targeted
+4. Why it is the best opportunity
 
-Expected Impact:
+Return ONLY valid JSON.
 
-Potential Risks:
+Format:
+
+[
+  {
+    "event":"Big Game",
+    "category":"Snack Cheese",
+    "brand":"Royal Hollandia",
+    "reason":"Strong snack consumption and entertaining occasions drive demand before the Big Game."
+  },
+  {
+    "event":"Easter",
+    "category":"Gouda",
+    "brand":"Rembrandt",
+    "reason":"Premium entertaining occasions naturally align with aged gouda offerings."
+  }
+]
+
+Rules:
+
+- Output ONLY JSON
+- No markdown
+- No explanation outside JSON
+- Use only events listed above
 `;
 }
   

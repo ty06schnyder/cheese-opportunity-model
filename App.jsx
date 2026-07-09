@@ -1081,9 +1081,16 @@ const chartOptions = {
         onChange={handlePromotionUpload}
       />
 
+      {promotionData.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          Loaded {promotionData.length} IRI records
+        </div>
+      )}
+      
       <button
         style={{ marginTop: 15 }}
         onClick={generatePromotions}
+        disabled={!promotionData.length}
       >
         Generate Promotion Recommendations
       </button>

@@ -3,7 +3,7 @@ import React, { useState } from "react"; //testt
 import { Pie } from "react-chartjs-2"; //test
 import { ArcElement } from "chart.js"; //test
 
-import { Bar } from "react-chartjs-2"; //test
+import { Bar } from "react-chartjs-2"; //test test
 import {
   Chart as ChartJS,
   BarElement,

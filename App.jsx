@@ -740,7 +740,7 @@ const chartOptions = {
       {/* ✅ INPUT TAB */}
       {tab === "input" && (
         <div style={{ background: "white", padding: 20 }}>
-          <h2>Enter Metrics</h2>
+          <h2>Enter Products</h2>
           <div
   style={{
     display: "flex",
@@ -804,7 +804,7 @@ const chartOptions = {
             </div>
           ))}
 
-          <button onClick={addMetric}>+ Add Metric</button>
+          <button onClick={addMetric}>+ Add Product</button>
 
           <div style={{ marginTop: 10 }}>
             <button onClick={convertToOpportunity}>

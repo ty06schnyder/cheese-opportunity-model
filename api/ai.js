@@ -494,7 +494,7 @@ else {
 
     // ✅ Add timeout protection (prevents hanging forever)
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    const timeout = setTimeout(() => controller.abort(), 30000);
 
     const response = await fetch(
       "https://api.openai.com/v1/chat/completions",

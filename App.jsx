@@ -213,7 +213,6 @@ export default function App() {
         cleaned = cleaned.replace(/```json/g, "").replace(/```/g, "");
 
 
-        console.log("MAPPING RESPONSE:", data);
         const scores = JSON.parse(cleaned);
         const classRes = await fetch("/api/ai", {
           method: "POST",
@@ -228,7 +227,6 @@ export default function App() {
         });
 
         const classData = await classRes.json();
-        console.log("CLASSIFICATION RESPONSE:", classData);
 
         console.log("CLASSIFICATION RAW:");
         console.log(classData.text);

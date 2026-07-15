@@ -95,7 +95,7 @@ Return EXACTLY this structure:
   "Retailer Attractiveness": number
 }
 `;
-
+}
       
     else if (body.type === "insights") {
       prompt = `

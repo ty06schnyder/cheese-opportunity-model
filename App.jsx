@@ -741,7 +741,48 @@ const chartOptions = {
       {tab === "input" && (
         <div style={{ background: "white", padding: 20 }}>
           <h2>Enter Metrics</h2>
+          <div
+  style={{
+    display: "flex",
+    gap: 8,
+    flexWrap: "wrap",
+    marginBottom: 15,
+    marginTop: 10,
+  }}
+>
+  {criteria.map((c) => {
 
+    const tooltipMap = {
+      "Category Growth Potential":
+        "Required Metrics:\n• Dollar Sales Growth %\n• Unit Sales Growth %\n• Volume Growth %",
+
+      "White Space Opportunity":
+        "Required Metrics:\n• Market Share\n• Share Gap vs Category Leader\n• Distribution (%ACV)\n• Assortment Gaps",
+
+      "Retailer Attractiveness":
+        "Required Metrics:\n• Category Size ($)\n• Category Growth %\n• Segment Growth %\n• Current Share Position",
+    };
+
+    return (
+      <div
+        key={c}
+        title={tooltipMap[c]}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          background: "#f3f4f6",
+          padding: "5px 10px",
+          borderRadius: 10,
+          fontSize: "12px",
+          cursor: "help",
+        }}
+      >
+        {c}
+      </div>
+    );
+  })}
+</div>
           <input
             placeholder="Product Name"
             value={name}

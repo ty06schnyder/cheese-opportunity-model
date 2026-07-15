@@ -784,10 +784,24 @@ const chartOptions = {
         <div>
           {/* Criteria pills */}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {criteria.map((c) => (
-              <div
-                key={c}
-                style={{
+            {criteria.map((c) => {
+
+              const tooltipMap = {
+                "Category Growth Potential":
+                "Required Metrics:\n• Dollar Sales Growth %\n• Unit Sales Growth %\n• Volume Growth %",
+
+                "White Space Opportunity":
+                "Required Metrics:\n• Market Share\n• Share Gap vs Category Leader\n• Distribution (%ACV)\n• Assortment Gaps",
+
+                "Retailer Attractiveness":
+                "Required Metrics:\n• Category Size ($)\n• Category Growth %\n• Segment Growth %\n• Current Share Position",
+              };
+
+              return (
+                <div
+                  key={c}
+                  title={tooltipMap[c]}
+                  style={{
                   display: "flex",
                   alignItems: "center",
                   gap: 6,
@@ -795,11 +809,13 @@ const chartOptions = {
                   padding: "5px 10px",
                   borderRadius: 10,
                   fontSize: "12px",
+                  cursor: "help",
                 }}
               >
                 {c}
               </div>
-            ))}
+            );
+          })}
 
           </div>
           <div style={{ marginTop: 20, marginBottom: 20 }}>

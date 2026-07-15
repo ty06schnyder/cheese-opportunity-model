@@ -238,7 +238,6 @@ export default function App() {
         const newOpp = {
           id: Date.now() + Math.random(),
           name: productName,
-          category: classification.category,
 
           // AI Classification
           category: classification.category,
@@ -678,7 +677,6 @@ const chartOptions = {
 
     setShowAggregateModal(false);
   };
-  ``
   
   const getColor = (v) =>
     v >= 5
@@ -1208,7 +1206,7 @@ const chartOptions = {
           </ul>
         </div>
 
-  <      div>
+  <div>
           <strong>Ideal (Best Results)</strong>
           <ul>
             <li>Promo Lift</li>
@@ -1343,5 +1341,5 @@ const chartOptions = {
     </div>
   )}
   </div>
-)
+  );
 }

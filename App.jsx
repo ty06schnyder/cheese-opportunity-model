@@ -263,12 +263,11 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
 }
 
       } catch (err) {
-          console.error("ROW FAILED");
-          console.error("Product:", productName);
-          console.error("AI Response:", data?.text);
-          console.error(err);
-        }
+        console.error("ROW FAILED");
+        console.error("Product:", productName);
+        console.error(err);
       }
+    }
 
     if (newOpps.length > 0) {
       setOpps((prev) => [...prev, ...newOpps]);

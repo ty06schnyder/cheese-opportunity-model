@@ -260,10 +260,7 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
 }
 
       } catch (err) {
-          console.error("ROW FAILED");
-          console.error("Product:", productName);
-          console.error("AI Response:", data?.text);
-          console.error(err);
+          console.log("Skipping row due to error:", err);
         }
       }
     }
@@ -1347,3 +1344,4 @@ const chartOptions = {
   )}
   </div>
 )
+}

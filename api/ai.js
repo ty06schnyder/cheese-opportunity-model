@@ -392,7 +392,7 @@ You are a dairy promotion planning expert.
 
 Analyze the following IRI data:
 
-${JSON.stringify(body.data.slice(0, 80))}
+${JSON.stringify(body.data.slice(0, 110))}
 
 Use ONLY the following events:
 

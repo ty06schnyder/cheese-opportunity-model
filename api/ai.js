@@ -10,40 +10,91 @@ export default async function handler(req, res) {
     // ✅ =========================
     if (body.type === "mapping") {
       prompt = `
-You are a data processing engine for the U.S. cheese category.
+You are a commercial strategy analyst for the U.S. cheese category.
 
-Convert the following business metrics into scores from 1 to 5. Compare all products relative to all the other products on the list as well as just general real world metrics.
+Your job is to convert the provided IRI metrics into scores from 1 to 5 for the following criteria.
 
 Metrics:
 ${JSON.stringify(body.metrics, null, 2)}
 
-Criteria:
-${body.criteria.join(", ")}
+Scoring Framework
 
-Guidelines:
-- ~$15M in sales = strong
-- High distribution = high impact AND high competition
-- Lower price = easier execution
-- High velocity = higher growth
-- Use realistic cheese category assumptions
-- Use general business rules/best judgement to fill in blanks and match up metrics
+1. Category Growth Potential (40%)
 
-Rules:
-- Return ONLY raw JSON
-- Do NOT explain anything
-- Do NOT use markdown
+Purpose:
+Determine whether the category or segment is growing.
 
-Return ONLY JSON with ALL criteria:
+Use metrics such as:
+- Dollar Sales Growth %
+- Unit Sales Growth %
+- Volume Growth %
 
-Keys must match exactly:
-${body.criteria.join(", ")}
+Scoring:
+1 = Category declining (<0%)
+2 = Growth between 0-2%
+3 = Growth between 2-5%
+4 = Growth between 5-10%
+5 = Growth greater than 10%
 
-Example:
+2. White Space Opportunity (35%)
+
+Purpose:
+Determine how much room exists for FrieslandCampina to grow.
+
+Use metrics such as:
+- Market Share
+- Share Gap vs Leader
+- Distribution (%ACV)
+- Assortment Gaps
+
+Scoring:
+1 = Market leader, little room to grow
+2 = Strong position with limited opportunity
+3 = Moderate opportunity
+4 = Significant share/distribution gap
+5 = Large gap and substantial room for growth
+
+Examples:
+- Leader at 35% share and us at 5% share → likely a 5
+- Heavy distribution gaps → higher score
+- Low share in a large category → higher score
+
+3. Retailer Attractiveness (25%)
+
+Purpose:
+Determine whether the opportunity exists in a retailer worth investing in.
+
+Use metrics such as:
+- Category Size ($)
+- Category Growth %
+- Segment Growth %
+- Current Share Position
+
+Scoring:
+1 = Small retailer and declining category
+2 = Small retailer with limited opportunity
+3 = Medium opportunity
+4 = Large retailer or strong category growth
+5 = Large strategic retailer with strong growth and whitespace
+
+Additional Instructions
+
+- Use the metrics provided whenever available.
+- If a metric is missing, use reasonable commercial judgement.
+- Consider category context and real-world cheese market dynamics.
+- Return only scores from 1 through 5.
+- Return ONLY raw JSON.
+- Do NOT use markdown.
+- Do NOT provide explanations.
+
+Return EXACTLY this structure:
+
 {
-  ${body.criteria.map((c) => `"${c}": number`).join(",")}
+  "Category Growth Potential": number,
+  "White Space Opportunity": number,
+  "Retailer Attractiveness": number
 }
 `;
-    }
 
       
     else if (body.type === "insights") {
@@ -73,16 +124,40 @@ First, determine what type of analysis is required:
    - where to invest or defend
 
 Reference Data:
-You are given:
-1. A set of cheese products with quantitative performance scores across key criteria (e.g., Growth, Impact, Ease, Competition, Trend).
+
+You are given a set of cheese opportunities scored using the following framework:
+
+1. Category Growth Potential (40%)
+Measures category growth using:
+- Dollar Sales Growth %
+- Unit Sales Growth %
+- Volume Growth %
+
+2. White Space Opportunity (35%)
+Measures room for growth using:
+- Market Share
+- Share Gap vs Category Leader
+- Distribution (%ACV)
+- Assortment Gaps
+
+3. Retailer Attractiveness (25%)
+Measures retailer value using:
+- Category Size ($)
+- Category Growth %
+- Segment Growth %
+- Current Share Position
+
+Opportunity Data:
 
 ${JSON.stringify(body.opportunities)}
 
-Criteria:
-${body.criteria.join(", ")}
+Scoring Weights:
 
-Weights:
-${JSON.stringify(body.weights)}
+Category Growth Potential = 40%
+White Space Opportunity = 35%
+Retailer Attractiveness = 25%
+
+Interpret higher scores as stronger opportunities based on this framework.
 
 2. A structured overview of FrieslandCampina’s priority brands, including their positioning, heritage, product range, formats, role in the portfolio, and competitive lens.
 

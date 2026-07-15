@@ -22,7 +22,7 @@ ChartJS.register(
   ArcElement // ✅ ADD THIS
 );
 
-const defaultCriteria = ["Growth", "Impact", "Ease", "Competition", "Trend"];
+const defaultCriteria = ["Category Growth Potential", "White Space Opportunity", "Retailer Attractiveness",];
 // Test
 const aggregateOptions = [
   "Gouda",
@@ -66,9 +66,11 @@ export default function App() {
   const [sortBy, setSortBy] = useState("total");
   const [chartMetric, setChartMetric] = useState("total");
   const [hiddenProducts, setHiddenProducts] = useState([]);
-  const [weights, setWeights] = useState(
-    Object.fromEntries(defaultCriteria.map((c) => [c, 20]))
-  );
+  const [weights] = useState({
+    "Category Growth Potential": 40,
+    "White Space Opportunity": 35,
+    "Retailer Attractiveness": 25,
+  });
 
   const [opps, setOpps] = useState([]);
   const [aggregates, setAggregates] = useState([]);
@@ -85,15 +87,6 @@ export default function App() {
 
   const [categoryFilter, setCategoryFilter] = useState("All");
   // ✅ ADD / REMOVE CRITERIA
-  const addCriteria = () => {
-    const newName = prompt("Enter new criteria");
-    if (!newName) return;
-
-    setCriteria([...criteria, newName]);
-    setWeights({ ...weights, [newName]: 20 });
-
-    setOpps(opps.map((o) => ({ ...o, [newName]: 3 })));
-  };
   
   const refineInsights = async () => {
     if (!followup) return;
@@ -130,21 +123,6 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  };
-  const removeCriteria = (name) => {
-    setCriteria(criteria.filter((c) => c !== name));
-
-    const newWeights = { ...weights }; 
-    delete newWeights[name];
-    setWeights(newWeights);
-
-    setOpps(
-      opps.map((o) => {
-        const copy = { ...o };
-        delete copy[name];
-        return copy;
-      })
-    );
   };
 
   // ✅ METRICS INPUT
@@ -816,24 +794,9 @@ const chartOptions = {
                 }}
               >
                 {c}
-                <button
-                  onClick={() => removeCriteria(c)}
-                  style={{
-                    fontSize: 10,
-                    width: 16,
-                    height: 16,
-                    borderRadius: "50%",
-                    border: "none",
-                    background: "#e5e7eb",
-                    cursor: "pointer",
-                  }}
-                >
-                  ✕
-                </button>
               </div>
             ))}
 
-            <button onClick={addCriteria}>+ Add</button>
           </div>
           <div style={{ marginTop: 20, marginBottom: 20 }}>
             <h3>Controls</h3>

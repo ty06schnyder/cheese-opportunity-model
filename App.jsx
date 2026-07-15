@@ -262,7 +262,6 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
           console.log("Skipping row due to error:", err);
         }
       }
-    }
 
     if (newOpps.length > 0) {
       setOpps((prev) => [...prev, ...newOpps]);

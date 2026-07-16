@@ -39,24 +39,57 @@ const aggregateOptions = [
   "Other",
 ];
 const holidayMap = {
-  Q1: ["New Year", "Superbowl", "Easter"],
-  Q2: ["Memorial Day", "July 4th"],
-  Q3: ["Back to School", "Labor Day", "Halloween"],
-  Q4: ["Christmas", "Black Friday"],
+  Q1: ["Superbowl", "Easter"],
+  Q2: ["Memorial Day", "Cinco de Mayo"],
+  Q3: ["Back to School", "Labor Day", "July 4th"],
+  Q4: ["Halloween", "Thanksgiving", "Christmas", "New Years Eve"],
 };
 
 function weekToEvent(week) {
-  if (week <= 5) return "New Year";
-  if (week <= 8) return "Superbowl";
-  if (week <= 16) return "Easter";
-  if (week <= 22) return "Memorial Day";
-  if (week <= 28) return "July 4th";
-  if (week <= 36) return "Back to School";
-  if (week <= 38) return "Labor Day";
-  if (week <= 44) return "Halloween";
 
-  return "Christmas";
+  if (week <= 8) {
+    return "Superbowl";
+  }
+
+  if (week <= 16) {
+    return "Easter";
+  }
+
+  if (week <= 19) {
+    return "Cinco de Mayo";
+  }
+
+  if (week <= 22) {
+    return "Memorial Day";
+  }
+
+  if (week <= 28) {
+    return "July 4th";
+  }
+
+  if (week <= 36) {
+    return "Back to School";
+  }
+
+  if (week <= 38) {
+    return "Labor Day";
+  }
+
+  if (week <= 44) {
+    return "Halloween";
+  }
+
+  if (week <= 48) {
+    return "Thanksgiving";
+  }
+
+  if (week <= 52) {
+    return "Christmas";
+  }
+
+  return "New Years Eve";
 }
+
 export default function App() {
   const [tab, setTab] = useState("input");
   const [promotionData, setPromotionData] = useState([]);
@@ -1325,7 +1358,6 @@ const chartOptions = {
                 .filter((item) => {
                   if (quarter === "Q1") {
                     return [
-                      "New Year",
                       "Superbowl",
                       "Easter",
                     ].includes(item.event);
@@ -1334,7 +1366,7 @@ const chartOptions = {
                   if (quarter === "Q2") {
                     return [
                       "Memorial Day",
-                      "July 4th",
+                      "Cinco de Mayo",
                     ].includes(item.event);
                   }
 
@@ -1342,13 +1374,15 @@ const chartOptions = {
                     return [
                       "Back to School",
                       "Labor Day",
-                      "Halloween",
+                      "July 4th",
                     ].includes(item.event);
                   }
 
                   return [
-                    "Black Friday",
+                    "Halloween",
                     "Christmas",
+                    "Thanksgiving",
+                    "New Years Eve",
                   ].includes(item.event);
                 })
                 .map((item, index) => (

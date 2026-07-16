@@ -397,22 +397,23 @@ ${JSON.stringify(body.data.slice(0, 50))}
 Use ONLY the following events:
 
 Q1
-- New Year
 - Superbowl
 - Easter
 
 Q2
 - Memorial Day
-- July 4th
+- Cinco de Mayo
 
 Q3
+- July 4th
 - Back to School
 - Labor Day
-- Halloween
 
 Q4
-- Black Friday
+- Halloween
+- Thanksgiving
 - Christmas
+- New Years Eve
 
 Use FrieslandCampina brands:
 

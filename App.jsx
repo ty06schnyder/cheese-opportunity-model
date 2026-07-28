@@ -111,7 +111,7 @@ export default function App() {
   const [selectedAggregateType, setSelectedAggregateType] = useState("Gouda");
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [editing, setEditing] = useState(null);
-  const [editValue, setEditValue] = useState("");
+  const [editValue, setEditValue] = useState("")
   const [metrics, setMetrics] = useState([{ name: "", value: "" }]);
   const [name, setName] = useState("");
   const [followup, setFollowup] = useState("");

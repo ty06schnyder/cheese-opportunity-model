@@ -464,6 +464,7 @@ Rules:
 `;
 }
 else if (body.type === "promotionDetail") {
+
   prompt = `
 You are a shopper marketing strategist.
 
@@ -479,20 +480,19 @@ ${body.brand}
 Available Retail Promotion Programs:
 
 ${JSON.stringify(body.shopperMarketingData, null, 2)}
-`;
 
 Important:
 
 Use ONLY programs found in the uploaded shopper marketing database.
 
 Do not invent:
-
 - retailers
 - program names
 - costs
 - objectives
 
 Only recommend retailer programs that exist in the uploaded file.
+
 Rank programs using:
 
 1. Seasonal relevance
@@ -505,10 +505,8 @@ Rank programs using:
 Return the 10 best programs.
 
 Return ONLY raw JSON.
-No markdown.
-No explanations.
 
-Return exactly:
+Format:
 
 {
   "programs": [
@@ -523,47 +521,9 @@ Return exactly:
     }
   ]
 }
-  Example:
-
-Back to School
-
-Snack Cheese
-
-Strong choices:
-- Digital Flyer
-- Smart Saver
-- Weekly Ad
-- Feature Promotions
-
-Less relevant:
-- Grand Opening Events
-- New Item Launch Programs
-
-Programs with Objective = Conversion
-should generally rank higher for promotional events.
-
-Programs with Objective = Awareness
-should rank higher for launches.
-
-Programs with Objective = Trial
-should rank higher for sampling opportunities.
-{
-  "programs": [
-    {
-      "rank":1,
-      "retailer":"BJ's",
-      "programName":"Smart Saver Offer",
-      "programType":"Coupon",
-      "objective":"Conversion",
-      "cost":"32500",
-      "reason":"Strong conversion vehicle for Back to School shoppers."
-    }
-  ]
+`;
 }
-  return res.status(200).json({
-  text: responseText,
-});
-}
+  
 else if (body.type === "followup") {
   prompt = `
 You are a strategic advisor helping analyze CPG product opportunities.

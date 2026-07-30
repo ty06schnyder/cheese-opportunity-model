@@ -493,16 +493,17 @@ Do not invent:
 
 Only recommend retailer programs that exist in the uploaded file.
 
-Rank programs using:
+Rank the five most relevant programs.
 
-1. Seasonal relevance
-2. Category relevance
-3. Conversion effectiveness
-4. Reach/impressions
-5. Cost efficiency
-6. Lead time requirements
-
-Return the 10 best programs.
+Consider:
+- Event fit
+- Category fit
+- Retail relevance
+- Reach
+- Impressions
+- Budget
+- Objective
+- Program type
 
 Return ONLY raw JSON.
 

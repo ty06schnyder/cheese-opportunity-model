@@ -677,7 +677,6 @@ const chartOptions = {
         throw err;
       }
 
-      setPromotionCalendar(calendar);
 
     } catch (e) {
       console.error(e);

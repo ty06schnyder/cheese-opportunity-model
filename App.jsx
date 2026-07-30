@@ -94,6 +94,7 @@ export default function App() {
   const [tab, setTab] = useState("input");
   const [promotionData, setPromotionData] = useState([]);
   const [promotionCalendar, setPromotionCalendar] = useState([]);
+  const [selectedPromotion, setSelectedPromotion] = useState(null);
   const [criteria, setCriteria] = useState(defaultCriteria);
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState("total");
@@ -754,6 +755,39 @@ const chartOptions = {
       promotionScore: Number(score.toFixed(2))
     };
   });
+
+  const getMatchingPrograms = (
+    recommendation
+  ) => {
+
+    if (
+      !recommendation ||
+      !promotionData.length
+    ) {
+      return [];
+    }
+
+    const text = JSON.stringify(
+      recommendation
+    ).toLowerCase();
+
+    return promotionData.filter(
+      (program) => {
+
+        const retailer =
+          JSON.stringify(program)
+            .toLowerCase();
+
+        return (
+          text.includes("awareness")
+            ? retailer.includes("awareness")
+            : true
+        );
+
+      }
+    );
+
+  };
   
   return (
     <div style={{ padding: 40, background: "#f6f8fb" }}>
@@ -1388,6 +1422,9 @@ const chartOptions = {
                 .map((item, index) => (
                   <div
                     key={index}
+                    onClick={() =>
+                      setSelectedPromotion(item)
+                    }
                     style={{
                       background: "#f3f4f6",
                       padding: 15,
@@ -1418,7 +1455,98 @@ const chartOptions = {
           ))}
         </div>
       )}
-      
+
+      {selectedPromotion && (
+
+        <div
+          style={{
+            background: "white",
+            padding: 20,
+            borderRadius: 10,
+            marginTop: 20,
+            border: "1px solid #e5e7eb",
+          }}
+        >
+
+          <h2>
+            Promotion Playbook
+          </h2>
+
+          <h3>
+            {selectedPromotion.event}
+          </h3>
+
+          <div>
+            <strong>Category:</strong>
+            {" "}
+            {selectedPromotion.category}
+          </div>
+
+          <div>
+            <strong>Brand:</strong>
+            {" "}
+            {selectedPromotion.brand}
+          </div>
+
+          <div
+            style={{
+              marginTop: 15
+            }}
+          >
+            <strong>Reason:</strong>
+          </div>
+
+          <div>
+            {selectedPromotion.reason}
+          </div>
+
+          <h3
+            style={{
+              marginTop: 20
+            }}
+          >
+            Matching Retail Programs
+          </h3>
+
+          {getMatchingPrograms(
+            selectedPromotion
+          ).slice(0, 15)
+            .map((program, i) => (
+
+            <div
+              key={i}
+              style={{
+                padding: 10,
+                border:
+                  "1px solid #e5e7eb",
+                borderRadius: 8,
+                marginBottom: 10,
+              }}
+            >
+
+              {Object.entries(program)
+                .map(([key, value]) => (
+
+                <div key={key}>
+
+                  <strong>
+                    {key}:
+                  </strong>
+
+                  {" "}
+                  {value}
+
+                </div>
+
+              ))}
+
+            </div>
+
+          ))}
+
+        </div>
+
+      )}
       {insights && (
         <div
           style={{

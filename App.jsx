@@ -93,6 +93,8 @@ function weekToEvent(week) {
 export default function App() {
   const [tab, setTab] = useState("input");
   const [promotionData, setPromotionData] = useState([]);
+  const [shopperMarketingData, setShopperMarketingData] = useState([]);
+  const [promotionDetail, setPromotionDetail] = useState(null);
   const [promotionCalendar, setPromotionCalendar] = useState([]);
   const [selectedPromotion, setSelectedPromotion] = useState(null);
   const [criteria, setCriteria] = useState(defaultCriteria);
@@ -355,7 +357,62 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
 
     reader.readAsText(file);
   };
-  
+
+  const handleShopperMarketingUpload = (e) => {
+
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+
+    const text = event.target.result;
+
+    const rows = text
+      .split("\n")
+      .map((r) =>
+        r
+          .split(
+            /,(?=(?:(?:[^"]*"){2})*[^"]*$)/
+          )
+          .map((c) =>
+            c.replace(/"/g, "").trim()
+          )
+      );
+
+    const headers = rows[0];
+
+    const data = rows.slice(1).map(
+      (row) => {
+
+        const obj = {};
+
+        headers.forEach((h, i) => {
+          obj[h.trim()] = row[i];
+        });
+
+        return obj;
+
+      }
+    );
+
+    console.log(
+      "SHOPPER MARKETING:"
+    );
+
+    console.log(data);
+
+    setShopperMarketingData(
+      data
+    );
+
+  };
+
+  reader.readAsText(file);
+
+};
   const updateScore = (id, criteriaName, value) => {
     let num = Number(value);
 
@@ -824,6 +881,78 @@ const chartOptions = {
     );
 
   };
+
+  const openPromotionDetail =
+  async (item) => {
+
+    if (
+      !shopperMarketingData.length
+    ) {
+      alert(
+        "Please upload the Shopper Marketing file."
+      );
+      return;
+    }
+
+    try {
+
+      const res =
+        await fetch("/api/ai", {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+
+            type:
+              "promotionDetail",
+
+            event:
+              item.event,
+
+            category:
+              item.category,
+
+            brand:
+              item.brand,
+
+            shopperMarketingData,
+
+          }),
+
+        });
+
+      const data =
+        await res.json();
+
+      const parsed =
+        JSON.parse(
+          data.text
+        );
+
+      setPromotionDetail(
+        parsed
+      );
+
+      setSelectedPromotion(
+        item
+      );
+
+    } catch (e) {
+
+      console.error(e);
+
+      alert(
+        "Failed to load promotion details."
+      );
+
+    }
+
+};
   
   return (
     <div style={{ padding: 40, background: "#f6f8fb" }}>
@@ -1388,6 +1517,42 @@ const chartOptions = {
         onChange={handlePromotionUpload}
       />
 
+      <div
+  style={{
+    marginTop: 15
+  }}
+>
+  <strong>
+    Shopper Marketing File
+  </strong>
+
+  <div>
+    <input
+      type="file"
+      accept=".csv"
+      onChange={
+        handleShopperMarketingUpload
+      }
+    />
+  </div>
+
+  {shopperMarketingData.length > 0 && (
+
+    <div
+      style={{
+        marginTop: 5
+      }}
+    >
+      Loaded
+      {" "}
+      {shopperMarketingData.length}
+      {" "}
+      shopper marketing programs
+    </div>
+
+  )}
+</div>
+
       {promotionData.length > 0 && (
         <div style={{ marginTop: 10 }}>
           Loaded {promotionData.length} IRI records
@@ -1459,7 +1624,7 @@ const chartOptions = {
                   <div
                     key={index}
                     onClick={() =>
-                      setSelectedPromotion(item)
+                      openPromotionDetail(item)
                     }
                     style={{
                       background: "#f3f4f6",
@@ -1544,41 +1709,79 @@ const chartOptions = {
             Matching Retail Programs
           </h3>
 
-          {getMatchingPrograms(
-            selectedPromotion
-          ).slice(0, 15)
-            .map((program, i) => (
+          {promotionDetail?.programs?.map(
+            (program, i) => (
 
-            <div
-              key={i}
-              style={{
-                padding: 10,
-                border:
-                  "1px solid #e5e7eb",
-                borderRadius: 8,
-                marginBottom: 10,
-              }}
-            >
+          <div
+            key={i}
+    style={{
+      padding: 10,
+      border:
+        "1px solid #e5e7eb",
+      borderRadius: 8,
+      marginBottom: 10,
+    }}
+  >
 
-              {Object.entries(program)
-                .map(([key, value]) => (
+    <div>
+      <strong>
+        Rank:
+      </strong>
+      {" "}
+      {program.rank}
+    </div>
 
-                <div key={key}>
+    <div>
+      <strong>
+        Retailer:
+      </strong>
+      {" "}
+      {program.retailer}
+    </div>
 
-                  <strong>
-                    {key}:
-                  </strong>
+    <div>
+      <strong>
+        Program:
+      </strong>
+      {" "}
+      {program.programName}
+    </div>
 
-                  {" "}
-                  {value}
+    <div>
+      <strong>
+        Type:
+      </strong>
+      {" "}
+      {program.programType}
+    </div>
 
-                </div>
+    <div>
+      <strong>
+        Objective:
+      </strong>
+      {" "}
+      {program.objective}
+    </div>
 
-              ))}
+    <div>
+      <strong>
+        Cost:
+      </strong>
+      {" "}
+      {program.cost}
+    </div>
 
-            </div>
+    <div>
+      <strong>
+        Why:
+      </strong>
+      {" "}
+      {program.reason}
+    </div>
 
-          ))}
+  </div>
+
+))}
 
         </div>
 

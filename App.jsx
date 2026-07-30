@@ -324,7 +324,15 @@ if (!newOpps.some((o) => o.name === newOpp.name)) {
 
       const rows = text
         .split("\n")
-        .map((r) => r.split(","));
+        .map((r) =>
+          r
+            .split(
+              /,(?=(?:(?:[^"]*"){2})*[^"]*$)/
+            )
+            .map((c) =>
+              c.replace(/"/g, "").trim()
+            )
+        );
 
       const headers = rows[0];
 
@@ -631,6 +639,12 @@ const chartOptions = {
 
       const data = await res.json();
 
+      console.log(
+        "PROMOTION API RESPONSE:"
+      );
+
+      console.log(data);
+
       let cleaned = data.text || "";
 
       cleaned = cleaned
@@ -638,7 +652,30 @@ const chartOptions = {
         .replace(/```/g, "")
         .trim();
 
-      const calendar = JSON.parse(cleaned);
+      console.log(
+        "PROMOTION RAW:"
+      );
+
+      console.log(cleaned);
+      try {
+
+        const calendar =
+          JSON.parse(cleaned);
+
+        setPromotionCalendar(
+          calendar
+        );
+
+      } catch (err) {
+
+        console.error(
+          "PROMOTION JSON FAILED"
+        );
+
+        console.error(cleaned);
+
+        throw err;
+      }
 
       setPromotionCalendar(calendar);
 

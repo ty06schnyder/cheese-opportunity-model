@@ -927,16 +927,28 @@ const chartOptions = {
         });
 
       const data =
-        await res.json();
+  await res.json();
 
-      const parsed =
-        JSON.parse(
-          data.text
-        );
+let cleaned =
+  data.text || "";
 
-      setPromotionDetail(
-        parsed
-      );
+cleaned = cleaned
+  .replace(/```json/g, "")
+  .replace(/```/g, "")
+  .trim();
+
+console.log(
+  "PROMOTION DETAIL RAW:"
+);
+
+console.log(cleaned);
+
+const parsed =
+  JSON.parse(cleaned);
+
+setPromotionDetail(
+  parsed
+);
 
       setSelectedPromotion(
         item

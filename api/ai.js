@@ -594,6 +594,7 @@ Instructions:
 - Consider pricing, positioning, competition, and strategy
 
 Return a refined set of recommendations.
+SERIOUSLY DO NOT USE ** AT ANY POINT IN YOUR RESPONSE, EVEN IN AN ATTEMPT TO UTILIZE Markdown syntax
 `;
 }
     // ✅ Safety: missing type

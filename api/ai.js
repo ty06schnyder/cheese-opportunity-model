@@ -392,7 +392,7 @@ You are a dairy promotion planning expert.
 
 Analyze the following IRI data:
 
-${JSON.stringify(body.data.slice(0, 50))}
+${JSON.stringify(body.data.slice(0, 60))}
 
 Use ONLY the following events:
 
@@ -479,7 +479,7 @@ ${body.brand}
 
 Available Retail Promotion Programs:
 
-${JSON.stringify(body.shopperMarketingData.slice(0, 100), null, 2)}
+${JSON.stringify(body.shopperMarketingData.slice(0, 150), null, 2)}
 
 Maximum Budget:
 

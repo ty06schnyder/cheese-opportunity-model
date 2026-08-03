@@ -420,7 +420,7 @@ Use FrieslandCampina brands:
 - Royal Hollandia (Premium Dutch cheese, known for Gouda and everyday Dutch cheeses. Good for snacking or less fancy events.)
 - Rembrandt (Super-premium Dutch brand; known for aged Gouda and specialty cheeses)
 - Parrano (Parmesean and gouda mix, not a great melting cheese but known for snacking & charcuterie cheese)
-- Gayo Azul (Mainstream Hispanic brand; known for Hispanic cooking cheeses (Queso Blanco, Cotija, etc.), also has a gouda slices product that makes for a great melting cheese)
+- Gayo Azul (Mainstream Hispanic brand; known for Hispanic cooking cheeses and melting cheeses (Queso Blanco, Cotija, etc.), also has a gouda slices product that makes for a great melting cheese)
 - Melkbus Truffle (Premium gourmet brand; known for truffle specialty cheese and entertaining occasions.)
 
 Determine:

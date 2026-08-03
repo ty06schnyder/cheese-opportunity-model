@@ -96,7 +96,7 @@ export default function App() {
   const [shopperMarketingData, setShopperMarketingData] = useState([]);
   const [promotionDetail, setPromotionDetail] = useState(null);
   const [promotionCalendar, setPromotionCalendar] = useState([]);
-  const [promotionBudget, setPromotionBudget] =cuseState("");
+  const [promotionBudget, setPromotionBudget] = useState("");
   const [excludedRetailers, setExcludedRetailers] = useState("");
   const [selectedPromotion, setSelectedPromotion] = useState(null);
   const [criteria, setCriteria] = useState(defaultCriteria);

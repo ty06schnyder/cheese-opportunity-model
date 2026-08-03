@@ -1057,7 +1057,7 @@ setPromotionDetail(
             </div>
           ))}
 
-          <button onClick={addMetric}>+ Add Product</button>
+          <button onClick={addMetric}>+ Add Metric</button>
 
           <div style={{ marginTop: 10 }}>
             <button onClick={convertToOpportunity}>

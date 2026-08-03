@@ -587,14 +587,13 @@ Update and refine your recommendations based on this new information.
 
 Instructions:
 - Use exact percentages or numbers when discussing the growth of a specific metric
-- No markdown (** or ###), don't try to bold text either (do not use asterisk's anywhere in your response)
+- No markdown (** or ###), not even to do markdown syntax
 - Do NOT repeat the original insights word for word
 - Modify or improve recommendations based on the new input
 - Be specific and actionable
 - Consider pricing, positioning, competition, and strategy
 
 Return a refined set of recommendations.
-SERIOUSLY DO NOT USE ** AT ANY POINT IN YOUR RESPONSE, EVEN IN AN ATTEMPT TO UTILIZE Markdown syntax
 `;
 }
     // ✅ Safety: missing type

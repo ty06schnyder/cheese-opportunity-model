@@ -481,11 +481,40 @@ Available Retail Promotion Programs:
 
 ${JSON.stringify(body.shopperMarketingData, null, 2)}
 
+Maximum Budget:
+
+${body.budget || "No limit"}
+
+Excluded Retailers:
+
+${JSON.stringify(
+  body.excludedRetailers || []
+)}
+
 Important:
 
 Use ONLY programs found in the uploaded shopper marketing database.
 
 CRITICAL:
+
+Do not recommend any retailer
+listed in Excluded Retailers.
+
+Ignore those retailers completely.
+
+Only recommend programs whose cost
+is less than or equal to the
+Maximum Budget.
+
+If budget is blank,
+ignore budget filtering.
+
+If fewer programs qualify,
+return fewer programs.
+
+Never invent programs.
+Never invent costs.
+Never invent retailers.
 
 Every recommendation MUST use an exact value from the
 "Program Name" column.

@@ -580,6 +580,9 @@ ${body.previousInsights}
 The user has now added more context:
 ${body.userInput}
 
+If the user asks a question related to the data, please respond to the question at the top of the followup box in a section called "Question Response:"
+
+Otherwise,
 Update and refine your recommendations based on this new information.
 
 Instructions:

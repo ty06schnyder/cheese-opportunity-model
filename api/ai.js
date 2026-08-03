@@ -485,13 +485,23 @@ Important:
 
 Use ONLY programs found in the uploaded shopper marketing database.
 
-Do not invent:
-- retailers
-- program names
-- costs
-- objectives
+CRITICAL:
 
-Only recommend retailer programs that exist in the uploaded file.
+Every recommendation MUST use an exact value from the
+"Program Name" column.
+
+Never create generic names such as:
+
+- Retailer Promotion
+- Promotion
+- Store Promotion
+- BJs
+- Market Basket
+
+The Program Name must exactly match a value found in the uploaded file.
+
+If fewer than 5 valid programs exist,
+return fewer than 5 programs.
 
 Rank the five most relevant programs.
 
@@ -504,6 +514,12 @@ Consider:
 - Budget
 - Objective
 - Program type
+
+Before recommending a program:
+
+1. Find the exact row in the uploaded file.
+2. Use the Program Name from that row.
+3. Copy retailer, objective, cost, and type from that same row.
 
 Return ONLY raw JSON.
 

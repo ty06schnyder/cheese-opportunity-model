@@ -479,7 +479,7 @@ ${body.brand}
 
 Available Retail Promotion Programs:
 
-${JSON.stringify(body.shopperMarketingData, null, 2)}
+${JSON.stringify(body.shopperMarketingData.slice(0, 100), null, 2)}
 
 Maximum Budget:
 

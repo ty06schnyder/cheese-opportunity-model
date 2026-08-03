@@ -96,6 +96,8 @@ export default function App() {
   const [shopperMarketingData, setShopperMarketingData] = useState([]);
   const [promotionDetail, setPromotionDetail] = useState(null);
   const [promotionCalendar, setPromotionCalendar] = useState([]);
+  const [promotionBudget, setPromotionBudget] =cuseState("");
+  const [excludedRetailers, setExcludedRetailers] = useState("");
   const [selectedPromotion, setSelectedPromotion] = useState(null);
   const [criteria, setCriteria] = useState(defaultCriteria);
   const [filters, setFilters] = useState({});
@@ -922,6 +924,15 @@ const chartOptions = {
 
             shopperMarketingData,
 
+            budget:
+              promotionBudget,
+            
+            excludedRetailers:
+              excludedRetailers
+                .split("\n")
+                .map((r) => r.trim())
+                .filter(Boolean),
+
           }),
 
         });
@@ -1570,6 +1581,61 @@ setPromotionDetail(
           Loaded {promotionData.length} IRI records
         </div>
       )}
+
+      <div
+  style={{
+    marginTop: 20,
+    background: "white",
+    padding: 15,
+    borderRadius: 10,
+  }}
+>
+  <h3>
+    Promotion Constraints
+  </h3>
+
+  <div>
+    <label>
+      Maximum Budget ($)
+    </label>
+
+    <input
+      type="number"
+      value={promotionBudget}
+      onChange={(e) =>
+        setPromotionBudget(
+          e.target.value
+        )
+      }
+      placeholder="25000"
+    />
+  </div>
+
+  <div
+    style={{
+      marginTop: 10,
+    }}
+  >
+    <label>
+      Excluded Retailers
+    </label>
+
+    <textarea
+      value={excludedRetailers}
+      onChange={(e) =>
+        setExcludedRetailers(
+          e.target.value
+        )
+      }
+      placeholder={`Restaurant Depot
+Market Basket`}
+      style={{
+        width: "100%",
+        height: 80,
+      }}
+    />
+  </div>
+</div>
       
       <button
         style={{ marginTop: 15 }}
